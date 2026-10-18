@@ -24,7 +24,7 @@ docker compose up pb          # PocketBase local sur :8090
 pnpm --filter web dev         # Astro sur :4321
 pnpm lint && pnpm typecheck && pnpm test
 pnpm --filter markdown test -- -t "nom du test"   # un seul test Vitest
-pnpm e2e                      # Playwright contre docker compose
+pnpm e2e                      # Playwright (PW_CHROMIUM_PATH=/opt/pw-browsers/chromium dans le cloud)
 # après une migration : mettre à jour packages/pb-types/src/index.ts à la main
 ```
 

@@ -11,5 +11,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:4321',
     trace: 'retain-on-failure',
+    // Navigateur préinstallé (ex. /opt/pw-browsers/chromium) quand sa révision diffère de celle de Playwright.
+    launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
   },
 });
