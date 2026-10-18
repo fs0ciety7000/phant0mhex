@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const push = useCallback<ToastFn>(
     (text, kind = 'info') => {
       const id = ++seq.current;
-      setItems((l) => [...l.slice(-3), { id, text, kind }]);
+      setItems((l) => [...l.slice(-2), { id, text, kind }]);
       window.setTimeout(() => dismiss(id), kind === 'error' ? 8000 : 4000);
     },
     [dismiss],
@@ -37,7 +37,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               {t.kind === 'error' ? '⚠ ' : '> '}
               {t.text}
             </span>
-            <button type="button" className="adm-toast-x" aria-label="Fermer la notification" onClick={() => dismiss(t.id)}>
+            <button
+              type="button"
+              className="adm-toast-x"
+              aria-label="Fermer la notification"
+              onClick={() => dismiss(t.id)}
+            >
               ×
             </button>
           </div>

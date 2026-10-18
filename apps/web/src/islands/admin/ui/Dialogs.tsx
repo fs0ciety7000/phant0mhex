@@ -97,7 +97,12 @@ export function Modal({
         <>
           <header className="adm-dialog-head">
             <h2 id={titleId}>{title}</h2>
-            <button type="button" className="adm-btn is-ghost" aria-label="Fermer" onClick={() => ref.current?.close()}>
+            <button
+              type="button"
+              className="adm-btn is-ghost"
+              aria-label="Fermer"
+              onClick={() => ref.current?.close()}
+            >
               ×
             </button>
           </header>
@@ -174,6 +179,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
                 {req.intro && <div className="adm-dialog-msg">{req.intro}</div>}
                 {req.image && <img className="adm-dialog-img" src={req.image} alt="" />}
                 {req.fields.map((f, i) => (
+                  // biome-ignore lint/a11y/noLabelWithoutControl: le contrôle (input ou textarea) est choisi dynamiquement
                   <label key={f.name} className="adm-field">
                     <span>
                       {f.label}

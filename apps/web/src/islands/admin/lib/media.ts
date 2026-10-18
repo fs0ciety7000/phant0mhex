@@ -1,5 +1,5 @@
 import type { MediaRef } from '@nd/markdown';
-import { type Media, MEDIA_THUMBS } from '@nd/pb-types';
+import { MEDIA_THUMBS, type Media } from '@nd/pb-types';
 import { fileUrl, type TypedPocketBase } from './pb';
 
 export const MAX_UPLOAD = 15 * 1024 * 1024;

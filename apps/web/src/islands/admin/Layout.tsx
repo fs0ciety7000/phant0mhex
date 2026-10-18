@@ -37,7 +37,15 @@ export function Topbar({ crumbs, children }: { crumbs: ReactNode[]; children?: R
   );
 }
 
-export function Layout({ section, editor, children }: { section: string; editor: Editor; children: ReactNode }) {
+export function Layout({
+  section,
+  editor,
+  children,
+}: {
+  section: string;
+  editor: Editor;
+  children: ReactNode;
+}) {
   const pb = usePb();
   const qc = useQueryClient();
   const [slot, setSlot] = useState<HTMLElement | null>(null);

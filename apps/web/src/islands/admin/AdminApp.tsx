@@ -7,10 +7,10 @@ import { useEditor } from './lib/auth';
 import { createPb, PbContext, type TypedPocketBase, usePb } from './lib/pb';
 import { match, navigate, usePathname } from './lib/router';
 import { Login } from './pages/Login';
-import { Categories, Tags } from './pages/Taxonomies';
 import { MediaLibrary } from './pages/MediaLibrary';
 import { PostsList } from './pages/PostsList';
 import { ProjectsList } from './pages/ProjectsList';
+import { Categories, Tags } from './pages/Taxonomies';
 import { DialogProvider } from './ui/Dialogs';
 import { ToastProvider } from './ui/Toasts';
 
@@ -101,17 +101,18 @@ function Routes() {
     return <Redirect to={`/admin/login?next=${encodeURIComponent(path + location.search)}`} />;
   }
 
-  let page: ReactNode;
-  let section = rel.split('/')[0] ?? '';
-  let p: Record<string, string> | null;
   if (rel === '') return <Redirect to="/admin/billets" />;
+  const postId = match('billets/:id', rel)?.id;
+  const projectId = match('projets/:id', rel)?.id;
+  let section = rel.split('/')[0] ?? '';
+  let page: ReactNode;
   if (rel === 'billets') page = <PostsList />;
-  else if ((p = match('billets/:id', rel))) page = <PostEditorRoute param={p.id as string} />;
+  else if (postId) page = <PostEditorRoute param={postId} />;
   else if (rel === 'categories') page = <Categories />;
   else if (rel === 'tags') page = <Tags />;
   else if (rel === 'medias') page = <MediaLibrary />;
   else if (rel === 'projets') page = <ProjectsList />;
-  else if ((p = match('projets/:id', rel))) page = <ProjectEditor key={p.id} param={p.id as string} />;
+  else if (projectId) page = <ProjectEditor key={projectId} param={projectId} />;
   else if (rel === 'reglages') page = <Settings />;
   else {
     section = '';

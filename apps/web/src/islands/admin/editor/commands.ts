@@ -86,7 +86,12 @@ export function insertBlock(view: EditorView, text: string, sel?: [number, numbe
   const selection = sel
     ? EditorSelection.range(base + sel[0], base + sel[1])
     : EditorSelection.cursor(base + text.length);
-  view.dispatch({ changes: { from, to, insert }, selection, scrollIntoView: true, userEvent: 'input.format' });
+  view.dispatch({
+    changes: { from, to, insert },
+    selection,
+    scrollIntoView: true,
+    userEvent: 'input.format',
+  });
   return done(view);
 }
 

@@ -18,7 +18,9 @@ export const STATUS_LABEL: Record<PostStatus, string> = {
 const PER_PAGE = 20;
 
 export function StatusBadge({ post }: { post: Pick<Post, 'status' | 'published_at'> }) {
-  const live = post.status === 'published' && (!post.published_at || new Date(post.published_at.replace(' ', 'T')) <= new Date());
+  const live =
+    post.status === 'published' &&
+    (!post.published_at || new Date(post.published_at.replace(' ', 'T')) <= new Date());
   const label = post.status === 'published' && !live ? 'Publié (à venir)' : STATUS_LABEL[post.status];
   return <span className={`adm-badge is-${post.status}${live ? ' is-live' : ''}`}>{label}</span>;
 }
@@ -106,8 +108,8 @@ export function PostsList() {
       title: 'Supprimer le billet',
       message: (
         <>
-          Supprimer définitivement « <strong>{row.title || 'Sans titre'}</strong> » ? Cette action est irréversible.
-          Pour simplement le retirer du site, repassez-le en brouillon.
+          Supprimer définitivement « <strong>{row.title || 'Sans titre'}</strong> » ? Cette action est
+          irréversible. Pour simplement le retirer du site, repassez-le en brouillon.
         </>
       ),
       confirmLabel: 'Supprimer',
@@ -132,10 +134,15 @@ export function PostsList() {
           <span className="adm-accent">01 /</span> Billets
         </h1>
       </div>
-      <div className="adm-filters" role="search" aria-label="Filtrer les billets">
+      <search className="adm-filters" aria-label="Filtrer les billets">
         <label className="adm-field">
           <span>Recherche</span>
-          <input type="search" value={qInput} onChange={(e) => setQInput(e.target.value)} placeholder="Titre, slug…" />
+          <input
+            type="search"
+            value={qInput}
+            onChange={(e) => setQInput(e.target.value)}
+            placeholder="Titre, slug…"
+          />
         </label>
         <label className="adm-field">
           <span>Statut</span>
@@ -159,7 +166,7 @@ export function PostsList() {
             ))}
           </select>
         </label>
-      </div>
+      </search>
 
       {list.isError && (
         <p className="adm-error" role="alert">
@@ -195,7 +202,11 @@ export function PostsList() {
                 <td>{formatDate(row.published_at)}</td>
                 <td>{formatDate(row.updated)}</td>
                 <td className="adm-td-actions">
-                  <Link className="adm-btn is-small" to={`/admin/billets/${row.id}`} aria-label={`Éditer ${row.title}`}>
+                  <Link
+                    className="adm-btn is-small"
+                    to={`/admin/billets/${row.id}`}
+                    aria-label={`Éditer ${row.title}`}
+                  >
                     Éditer
                   </Link>
                   <button

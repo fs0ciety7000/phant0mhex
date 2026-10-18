@@ -22,7 +22,9 @@ export function CategoryField({ value, onChange }: { value: string; onChange: (i
     if (!name) return;
     try {
       const order = (cats.data?.reduce((m, c) => Math.max(m, c.order), 0) ?? 0) + 1;
-      const rec = await pb.collection('categories').create({ name, slug: slugify(name), order, description: '' });
+      const rec = await pb
+        .collection('categories')
+        .create({ name, slug: slugify(name), order, description: '' });
       qc.setQueryData<Category[]>(qk.categories, (l) => [...(l ?? []), rec]);
       qc.invalidateQueries({ queryKey: qk.categories });
       onChange(rec.id);

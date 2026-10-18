@@ -29,7 +29,14 @@ const partsFmt = new Intl.DateTimeFormat('en-GB', {
 function tzOffset(ms: number): number {
   const p: Record<string, string> = {};
   for (const x of partsFmt.formatToParts(new Date(ms))) p[x.type] = x.value;
-  const asUtc = Date.UTC(+(p.year ?? 0), +(p.month ?? 1) - 1, +(p.day ?? 1), +(p.hour ?? 0), +(p.minute ?? 0), +(p.second ?? 0));
+  const asUtc = Date.UTC(
+    +(p.year ?? 0),
+    +(p.month ?? 1) - 1,
+    +(p.day ?? 1),
+    +(p.hour ?? 0),
+    +(p.minute ?? 0),
+    +(p.second ?? 0),
+  );
   return asUtc - (ms - (ms % 1000));
 }
 
@@ -50,7 +57,13 @@ export function pbToLocalInput(s: string): string {
 export function localInputToPb(v: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v);
   if (!m) return '';
-  const guess = Date.UTC(+(m[1] as string), +(m[2] as string) - 1, +(m[3] as string), +(m[4] as string), +(m[5] as string));
+  const guess = Date.UTC(
+    +(m[1] as string),
+    +(m[2] as string) - 1,
+    +(m[3] as string),
+    +(m[4] as string),
+    +(m[5] as string),
+  );
   let utc = guess - tzOffset(guess);
   const off2 = tzOffset(utc);
   if (guess - off2 !== utc) utc = guess - off2;

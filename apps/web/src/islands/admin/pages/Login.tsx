@@ -25,7 +25,8 @@ export function Login() {
       await pb.collection('editors').authWithPassword(email, password);
       // succès sans MFA : Routes redirige.
     } catch (err) {
-      const mfaId = err instanceof ClientResponseError ? (err.response?.mfaId as string | undefined) : undefined;
+      const mfaId =
+        err instanceof ClientResponseError ? (err.response?.mfaId as string | undefined) : undefined;
       if (err instanceof ClientResponseError && err.status === 401 && mfaId) {
         try {
           const { otpId } = await pb.collection('editors').requestOTP(email);
@@ -54,7 +55,11 @@ export function Login() {
     try {
       await pb.collection('editors').authWithOTP(step.otpId, code, { mfaId: step.mfaId });
     } catch (err) {
-      setError(err instanceof ClientResponseError && err.status === 400 ? 'Code invalide ou expiré.' : errorMessage(err));
+      setError(
+        err instanceof ClientResponseError && err.status === 400
+          ? 'Code invalide ou expiré.'
+          : errorMessage(err),
+      );
     } finally {
       setBusy(false);
     }
@@ -80,7 +85,9 @@ export function Login() {
         <p className="adm-micro adm-muted">ND® / Console — Accès restreint</p>
         <h1 className="adm-login-title">Connexion</h1>
         <p className="adm-micro adm-muted">
-          {step.kind === 'password' ? 'Étape 1/2 — identifiants éditeur' : 'Étape 2/2 — code à usage unique (MFA)'}
+          {step.kind === 'password'
+            ? 'Étape 1/2 — identifiants éditeur'
+            : 'Étape 2/2 — code à usage unique (MFA)'}
         </p>
         {step.kind === 'password' ? (
           <form onSubmit={onPassword} className="adm-stack" aria-describedby={error ? errId : undefined}>

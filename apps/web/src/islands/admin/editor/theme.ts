@@ -1,7 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
-import { colors } from '@nd/tokens';
 import { tags as t } from '@lezer/highlight';
+import { colors } from '@nd/tokens';
 
 /** Thème CodeMirror ND-01 (Tactical Telemetry, sombre uniquement). */
 export const nd01Theme = EditorView.theme(
@@ -31,7 +31,11 @@ export const nd01Theme = EditorView.theme(
 );
 
 const style = HighlightStyle.define([
-  { tag: [t.heading1, t.heading2, t.heading3, t.heading4, t.heading5, t.heading6], color: colors.fg, fontWeight: '700' },
+  {
+    tag: [t.heading1, t.heading2, t.heading3, t.heading4, t.heading5, t.heading6],
+    color: colors.fg,
+    fontWeight: '700',
+  },
   { tag: t.heading1, textDecoration: 'underline', textDecorationColor: colors.accent },
   { tag: t.strong, fontWeight: '700', color: colors.fg },
   { tag: t.emphasis, fontStyle: 'italic' },

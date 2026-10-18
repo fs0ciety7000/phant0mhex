@@ -1,7 +1,15 @@
+import '@nd/markdown/markdown.css';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { Annotation, EditorState, Prec } from '@codemirror/state';
-import { drawSelection, dropCursor, EditorView, highlightActiveLine, keymap, placeholder } from '@codemirror/view';
+import {
+  drawSelection,
+  dropCursor,
+  EditorView,
+  highlightActiveLine,
+  keymap,
+  placeholder,
+} from '@codemirror/view';
 import type { Media } from '@nd/pb-types';
 import { type ReactNode, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
@@ -84,6 +92,7 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
   const [dragging, setDragging] = useState(false);
   const uploads = useRef(new Map<number, { from: number; to: number; next: string }>());
   const upSeq = useRef(0);
+  const emitted = useRef<string[]>([]);
   const mediaVer = useSyncExternalStore(subscribeMedia, mediaVersion, mediaVersion);
 
   const setMode = useCallback((m: Mode) => {
@@ -210,7 +219,10 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
               }
             }
             if (u.transactions.some((tr) => tr.annotation(External))) return;
-            cb.current.onChange(u.state.doc.toString());
+            const doc = u.state.doc.toString();
+            emitted.current.push(doc);
+            if (emitted.current.length > 32) emitted.current.shift();
+            cb.current.onChange(doc);
           }),
           EditorView.domEventHandlers({
             dragover(e) {
@@ -249,12 +261,14 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
     };
   }, []);
 
-  // Valeur modifiée de l'extérieur (rechargement serveur, brouillon restauré).
+  // Valeur modifiée de l'extérieur (rechargement serveur, brouillon restauré). Une valeur déjà
+  // émise par l'éditeur n'est qu'un rendu React en retard sur la vue : on l'ignore.
   useEffect(() => {
     const v = viewRef.current;
-    if (!v) return;
+    if (!v || emitted.current.includes(value)) return;
     const cur = v.state.doc.toString();
-    if (cur !== value) v.dispatch({ changes: { from: 0, to: cur.length, insert: value }, annotations: External.of(true) });
+    if (cur !== value)
+      v.dispatch({ changes: { from: 0, to: cur.length, insert: value }, annotations: External.of(true) });
   }, [value]);
 
   // ---------- raccourcis globaux (Mod-S, Mod-Shift-P) ----------
@@ -290,7 +304,8 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
         });
         if (alive) setHtml(res.html);
       } catch (e) {
-        if (alive) setHtml(`<p class="adm-error">⚠ Rendu impossible : ${String(e).replace(/</g, '&lt;')}</p>`);
+        if (alive)
+          setHtml(`<p class="adm-error">⚠ Rendu impossible : ${String(e).replace(/</g, '&lt;')}</p>`);
       }
     }, 150);
     return () => {
@@ -389,13 +404,20 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
         <fieldset className="adm-modes">
           <legend className="adm-sr">Mode d'affichage (Ctrl+Maj+P : aperçu)</legend>
           {MODES.map(([m, l]) => (
-            <button key={m} type="button" className="adm-mode" aria-pressed={mode === m} onClick={() => setMode(m)}>
+            <button
+              key={m}
+              type="button"
+              className="adm-mode"
+              aria-pressed={mode === m}
+              onClick={() => setMode(m)}
+            >
               {l}
             </button>
           ))}
         </fieldset>
       </div>
       <div className="adm-ed-panes">
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: retour visuel du glisser-déposer ; équivalent clavier = bouton IMG */}
         <div
           className={`adm-ed-src${dragging ? ' is-drag' : ''}`}
           onDragEnter={(e) => e.dataTransfer.types.includes('Files') && setDragging(true)}
@@ -409,14 +431,15 @@ export function MarkdownEditor({ value, onChange, onSave, label, postId, extra, 
           </div>
           <div className="adm-cm" ref={host} />
           <div className="adm-ed-drop adm-micro adm-muted">
-            Glisser-déposer ou coller une image → envoi PocketBase → <code>![alt](media:id)</code> inséré · ≤ 15 Mo
+            Glisser-déposer ou coller une image → envoi PocketBase → <code>![alt](media:id)</code> inséré · ≤
+            15 Mo
           </div>
         </div>
         <div className="adm-ed-prev">
           <div className="adm-ed-head adm-micro adm-muted">Aperçu — même moteur de rendu que le site</div>
           <div
             ref={previewRef}
-            className="adm-preview nd-prose"
+            className="adm-preview md-prose"
             // Le HTML vient de @nd/markdown (sanitisé par le pipeline, identique au site).
             // biome-ignore lint/security/noDangerouslySetInnerHtml: sortie du pipeline Markdown partagé
             dangerouslySetInnerHTML={{ __html: md ? html : '<p>Chargement du moteur de rendu…</p>' }}
