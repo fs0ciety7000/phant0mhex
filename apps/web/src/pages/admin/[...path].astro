@@ -1,6 +1,50 @@
 ---
-// Contrat (propriétaire : agent admin-react). SPA React montée en client:only sous /admin/*.
+// SPA d'administration (propriétaire : agent admin-react), montée en client:only sous /admin/*.
+// PUBLIC_PB_URL est lu à l'exécution (process.env) et passé en prop : jamais import.meta.env côté client.
+import '@nd/tokens/tokens.css';
+import AdminApp from '../../islands/admin/AdminApp';
+
 export const prerender = false;
+
+const pbUrl = process.env.PUBLIC_PB_URL ?? 'http://localhost:8090';
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 ---
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8" /><meta name="robots" content="noindex, nofollow" /><title>Console</title></head><body></body></html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="same-origin" />
+    <title>Console — ND-01</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    />
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      .adm-boot {
+        font: 11px/1.3 var(--f-mono);
+        letter-spacing: var(--ls-micro);
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <AdminApp client:only="react" pbUrl={pbUrl}>
+      <p class="adm-boot" slot="fallback">Chargement de la console…</p>
+    </AdminApp>
+    <noscript><p class="adm-boot">La console nécessite JavaScript.</p></noscript>
+  </body>
+</html>
