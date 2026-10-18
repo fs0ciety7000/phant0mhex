@@ -155,7 +155,7 @@ Recherche dans le journal : filtre PocketBase (`title ~ q || body ~ q`) via un e
 - À créer : `A pb.dessenius.be` → 152.53.176.13 (proxifié).
 - Cache Rule : mettre en cache le HTML de `dessenius.be/*` hors `/admin*` (respecte `s-maxage`).
 - Durcissement proposé : *Always Use HTTPS* activé, TLS min 1.2.
-- Cloudflare Access sur `pb.dessenius.be/_/*`.
+- Cloudflare Access sur `pb.dessenius.be/_` et `/api/collections/_superusers` (en place).
 - Ne pas toucher aux enregistrements mail (MX, SPF, DKIM, DMARC) ni à `mariage`, `elodie`, `grace`, `wedding`.
 
 

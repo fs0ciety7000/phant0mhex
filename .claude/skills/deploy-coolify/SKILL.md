@@ -35,6 +35,7 @@ Revérifier ces identifiants par un GET avant de s'en servir.
 Branche déployée : `claude/jolly-noether-wy8emz` (auto-deploy) tant qu'il n'y a pas de `main`.
 Statut d'un déploiement : `GET $CO/deployments/<deployment_uuid>` (champ `status`, logs JSON dans `logs`).
 Premier démarrage de PocketBase : le lien `/_/#/pbinstall/<jwt>` des logs (valable 30 min) crée le superuser ; sinon redémarrer l'app pour en regénérer un.
+Cloudflare Access : app « Admin PocketBase dessenius » (id `3568c01e-b9d0-4fc5-89b3-43696508f773`) protège `pb.dessenius.be/_` et `pb.dessenius.be/api/collections/_superusers` — politique « Propriétaire » (e-mail de Nicolas), session 24 h. L'API publique (`/api/collections/*/records`, `/api/files`, `/api/health`) reste ouverte : le site et l'admin en dépendent.
 Juste après un nouveau domaine, Cloudflare peut renvoyer 526 une à deux minutes, le temps que Traefik obtienne le certificat.
 
 ## Création des apps (une fois validé)
