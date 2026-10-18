@@ -13,6 +13,8 @@ export type PostStatus = 'draft' | 'scheduled' | 'published';
 
 export interface Editor extends BaseRecord {
   email: string;
+  emailVisibility: boolean;
+  verified: boolean;
   name: string;
   avatar: string;
 }
@@ -29,6 +31,10 @@ export interface Tag extends BaseRecord {
   slug: string;
 }
 
+// Visibilité publique : status = "published" && published_at <= maintenant.
+// Hooks serveur : slug (si vide), reading_time, revision (+1 à chaque sauvegarde, valeur client ignorée),
+// published_at = maintenant si publié sans date ; « scheduled » exige une date future et passe en
+// « published » via le cron (5 min) à échéance.
 export interface Post extends BaseRecord {
   title: string;
   slug: string;
@@ -47,6 +53,7 @@ export interface Post extends BaseRecord {
   expand?: { category?: Category; tags?: Tag[] };
 }
 
+// width/height : calculés par le hook à l'upload (PNG, JPEG, GIF, WebP, AVIF).
 export interface Media extends BaseRecord {
   file: string;
   alt: string;
@@ -74,6 +81,7 @@ export interface Social {
   url: string;
 }
 
+// Ligne unique : ni création ni suppression via l'API, seulement la mise à jour.
 export interface Site extends BaseRecord {
   bio: string;
   email: string;
