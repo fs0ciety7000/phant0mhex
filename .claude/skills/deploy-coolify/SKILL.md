@@ -25,6 +25,18 @@ curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$CF/accounts/$CLOUDFL
 
 Revérifier ces identifiants par un GET avant de s'en servir.
 
+## Apps déployées (2026-10-18)
+
+| App | uuid | Domaine | Notes |
+|---|---|---|---|
+| `dessenius-pb` | `xonc5i58h1cghoutkrpqzjlp` | `https://pb.dessenius.be` | volume persistant `dessenius-pb-data` → `/pb/pb_data`, watch path `apps/pb/**` |
+| `dessenius-web` | `ttc8svfscywqx9dtbdw0k7aa` | `dessenius.be`, `www` | env `PUBLIC_PB_URL`, `PB_INTERNAL_URL` (= URL publique pour l'instant), `SITE_URL` |
+
+Branche déployée : `claude/jolly-noether-wy8emz` (auto-deploy) tant qu'il n'y a pas de `main`.
+Statut d'un déploiement : `GET $CO/deployments/<deployment_uuid>` (champ `status`, logs JSON dans `logs`).
+Premier démarrage de PocketBase : le lien `/_/#/pbinstall/<jwt>` des logs (valable 30 min) crée le superuser ; sinon redémarrer l'app pour en regénérer un.
+Juste après un nouveau domaine, Cloudflare peut renvoyer 526 une à deux minutes, le temps que Traefik obtienne le certificat.
+
 ## Création des apps (une fois validé)
 
 1. `dessenius-pb` : build pack `dockerfile`, base directory `/apps/pb`, port 8090, volume persistant `/pb/pb_data`, domaine `https://pb.dessenius.be`, healthcheck `/api/health`.
