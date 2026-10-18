@@ -41,6 +41,9 @@ importers:
       '@codemirror/view':
         specifier: 6.38.6
         version: 6.38.6
+      '@lezer/highlight':
+        specifier: 1.2.5
+        version: 1.2.5
       '@nanostores/react':
         specifier: 2.0.1
         version: 2.0.1(nanostores@1.5.5)(react@19.3.1)
