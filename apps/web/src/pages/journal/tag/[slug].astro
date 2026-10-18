@@ -1,0 +1,45 @@
+---
+import JournalList from '../../../components/JournalList.astro';
+import SignalLost from '../../../components/SignalLost.astro';
+import Public from '../../../layouts/Public.astro';
+import { createData, pageParam } from '../../../lib/data';
+
+const slug = Astro.params.slug ?? '';
+const db = createData(Astro.locals);
+const page = pageParam(Astro.url);
+
+const [found, categories, index] = await Promise.all([db.tag(slug), db.categories(), db.logIndex()]);
+if (found.state === 'missing') return Astro.rewrite('/404');
+const tag = found.state === 'ok' ? found.value : undefined;
+if (!tag) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '30');
+}
+const result = tag
+  ? await db.posts({ page, where: (f) => f('tags ?= {:id}', { id: tag.id }) })
+  : { page, perPage: 12, totalItems: 0, totalPages: 0, items: [] };
+if (result.totalItems > 0 && page > result.totalPages) return Astro.rewrite('/404');
+const base = `/journal/tag/${slug}`;
+---
+<Public
+  title={tag ? `#${tag.name} — Journal — Nicolas Dessenius` : 'Étiquette indisponible — Nicolas Dessenius'}
+  description={`Billets du journal étiquetés « ${tag?.name ?? ''} ».`}
+  canonical={page > 1 ? `${base}?page=${page}` : base}
+  noindex={!tag}
+>
+  {
+    tag ? (
+      <JournalList
+        title={`#${tag.name}`}
+        kicker="ÉTIQUETTE"
+        result={result}
+        index={index}
+        categories={categories}
+        basePath={base}
+        degraded={Astro.locals.degraded}
+      />
+    ) : (
+      <SignalLost back={{ href: '/journal', label: 'JOURNAL' }} />
+    )
+  }
+</Public>

@@ -1,0 +1,62 @@
+---
+import type { Post } from '@nd/pb-types';
+import { dateShort, isoDate, logId, PH, pad } from '../lib/format';
+
+interface Props {
+  post?: Post;
+  no?: number;
+  /** Rang visuel dans la grille (01, 02…) quand le numéro LOG est inconnu. */
+  rank: number;
+  headingLevel?: 2 | 3;
+}
+const { post, no, rank, headingLevel = 3 } = Astro.props;
+const H = headingLevel === 2 ? 'h2' : 'h3';
+const cat = post?.expand?.category;
+const href = post ? `/journal/${post.slug}` : undefined;
+---
+{
+  post ? (
+    <article class="card" data-reveal>
+      <div class="meta m">
+        {cat ? (
+          <a class="ac" href={`/journal/categorie/${cat.slug}`}>
+            [{cat.name}]
+          </a>
+        ) : (
+          <span class="ac">[{PH}]</span>
+        )}
+        <span class="mu tab">
+          <time datetime={isoDate(post.published_at)}>{dateShort(post.published_at)}</time> ·{' '}
+          {post.reading_time || PH} MIN
+        </span>
+      </div>
+      <span class="no tab" aria-hidden="true">
+        {pad(no ?? rank, 2)}
+      </span>
+      <H>
+        <a href={href}>{post.title}</a>
+      </H>
+      <p>{post.excerpt || PH}</p>
+      <div class="foot m">
+        <span class="mu tab">{logId(no)}</span>
+        <a class="btn" href={href} aria-label={`Lire « ${post.title} »`}>
+          <span data-scramble>LIRE</span> <span class="ac">&gt;&gt;&gt;</span>
+        </a>
+      </div>
+    </article>
+  ) : (
+    <article class="card ph" aria-hidden="true">
+      <div class="meta m">
+        <span class="ac">[CATÉGORIE]</span>
+        <span class="mu tab">[DATE] · [X] MIN</span>
+      </div>
+      <span class="no tab">{pad(rank, 2)}</span>
+      <H>[TITRE DU BILLET]</H>
+      <p>[EXTRAIT — CONTENU À VENIR]</p>
+      <div class="foot m">
+        <span class="mu">LOG-[…]</span>
+        <span class="mu">EN ATTENTE</span>
+      </div>
+    </article>
+  )
+}

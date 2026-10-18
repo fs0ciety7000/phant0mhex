@@ -1,0 +1,29 @@
+---
+import ProjectTable from '../../components/ProjectTable.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Public from '../../layouts/Public.astro';
+import { createData } from '../../lib/data';
+import { pad } from '../../lib/format';
+
+const db = createData(Astro.locals);
+const projects = await db.projects();
+---
+<Public
+  title="Projets — Nicolas Dessenius"
+  description="Index des projets de Nicolas Dessenius : jeux, outils et expériences interactives."
+  canonical="/projets"
+>
+  <section class="sec tight band" aria-labelledby="h-pro">
+    <SectionHead idx="02" title="PROJETS" id="h-pro" level={1} red>
+      <Fragment slot="note">INDEX<br /><span class="tab">{pad(projects.length)}</span> ENTRÉES</Fragment>
+    </SectionHead>
+    <ProjectTable projects={projects} />
+    {
+      projects.length === 0 && (
+        <p class="jhead after m mu">
+          /// AUCUN PROJET PUBLIÉ POUR L’INSTANT — {Astro.locals.degraded ? 'DONNÉES HORS LIGNE' : 'CONTENU À VENIR'}
+        </p>
+      )
+    }
+  </section>
+</Public>

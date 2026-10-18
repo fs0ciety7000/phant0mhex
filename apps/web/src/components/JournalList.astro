@@ -1,0 +1,144 @@
+---
+import type { Category, Post } from '@nd/pb-types';
+import { type ListResult, type LogEntry, logNo } from '../lib/data';
+import { pad } from '../lib/format';
+import PostCard from './PostCard.astro';
+import SectionHead from './SectionHead.astro';
+
+interface Props {
+  title: string;
+  /** Ligne d'en-tête (ex. « CATÉGORIE / GAME DESIGN »). */
+  kicker: string;
+  result: ListResult<Post>;
+  index: LogEntry[];
+  categories: Category[];
+  /** Slug de catégorie active (puces). */
+  activeCategory?: string;
+  /** Chemin de base pour la pagination. */
+  basePath: string;
+  /** Recherche (uniquement sur /journal). */
+  search?: { q: string };
+  degraded: boolean;
+}
+const { title, kicker, result, index, categories, activeCategory, basePath, search, degraded } = Astro.props;
+
+function pageHref(n: number): string {
+  const p = new URLSearchParams();
+  if (search?.q) p.set('q', search.q);
+  if (n > 1) p.set('page', String(n));
+  const qs = p.toString();
+  return qs ? `${basePath}?${qs}` : basePath;
+}
+const { page, totalPages, totalItems, items } = result;
+---
+<section class="sec tight band" aria-labelledby="h-jou">
+  <SectionHead idx="03" title={title} id="h-jou" level={1}>
+    <Fragment slot="note">{kicker}<br /><span class="tab">{pad(totalItems)}</span> BILLETS</Fragment>
+  </SectionHead>
+
+  <div class="tools">
+    {
+      search && (
+        <form class="search m" role="search" method="get" action="/journal">
+          <label for="q">&gt;_</label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            value={search.q}
+            maxlength="80"
+            placeholder="Rechercher…"
+            aria-label="Rechercher dans le journal"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="submit" class="m">
+            <span data-scramble>CHERCHER</span>
+          </button>
+        </form>
+      )
+    }
+    <nav aria-label="Catégories">
+      <ul class="chips m">
+        <li>
+          <a href="/journal" aria-current={!activeCategory && !search?.q ? 'page' : undefined}>
+            TOUT
+          </a>
+        </li>
+        {
+          categories.map((c) => (
+            <li>
+              <a
+                href={`/journal/categorie/${c.slug}`}
+                aria-current={activeCategory === c.slug ? 'page' : undefined}
+              >
+                {c.name}
+              </a>
+            </li>
+          ))
+        }
+        {categories.length === 0 && <li><span class="mu">[CATÉGORIES]</span></li>}
+      </ul>
+    </nav>
+    {
+      search?.q && (
+        <p class="m mu" role="status">
+          /// <span class="tab">{pad(totalItems)}</span> RÉSULTAT{totalItems > 1 ? 'S' : ''} POUR «{' '}
+          <samp class="ac">{search.q}</samp> » — <a href="/journal">EFFACER</a>
+        </p>
+      )
+    }
+  </div>
+
+  {
+    items.length > 0 ? (
+      <div class="jgrid">
+        {items.map((p, i) => (
+          <PostCard post={p} no={logNo(index, p.id)} rank={(page - 1) * result.perPage + i + 1} headingLevel={2} />
+        ))}
+      </div>
+    ) : (
+      <div class="empty">
+        <span class="m ac">[ 000 / RÉSULTAT ]</span>
+        <p class="big">
+          {degraded ? 'Signal perdu.' : search?.q ? 'Aucune correspondance.' : 'Aucun billet publié.'}
+        </p>
+        <p class="m mu">
+          {degraded
+            ? 'LA BASE DE CONTENU NE RÉPOND PAS — RÉESSAYEZ DANS QUELQUES INSTANTS.'
+            : search?.q
+              ? 'ESSAYEZ UN AUTRE TERME, OU PARCOUREZ LES CATÉGORIES.'
+              : 'CONTENU À VENIR [ … ]'}
+        </p>
+      </div>
+    )
+  }
+
+  {
+    totalPages > 1 && (
+      <nav class="pager m" aria-label="Pagination">
+        {page > 1 ? (
+          <a class="btn" href={pageHref(page - 1)} rel="prev">
+            <span class="ac">&lt;&lt;&lt;</span> PRÉC.
+          </a>
+        ) : (
+          <span class="btn off" aria-hidden="true">
+            &lt;&lt;&lt; PRÉC.
+          </span>
+        )}
+        <span class="mu tab">
+          PAGE {pad(page, 2)} / {pad(totalPages, 2)}
+        </span>
+        {page < totalPages ? (
+          <a class="btn next" href={pageHref(page + 1)} rel="next">
+            SUIV. <span class="ac">&gt;&gt;&gt;</span>
+          </a>
+        ) : (
+          <span class="btn next off" aria-hidden="true">
+            SUIV. &gt;&gt;&gt;
+          </span>
+        )}
+      </nav>
+    )
+  }
+</section>

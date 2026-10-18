@@ -1,0 +1,23 @@
+---
+import type { ComponentProps } from 'astro/types';
+import Footer from '../components/Footer.astro';
+import TopBar from '../components/TopBar.astro';
+import Motion from '../islands/motion/Motion.astro';
+import '../styles/public.css';
+// biome-ignore lint/style/useImportType: composant utilisé dans le template
+import Base from './Base.astro';
+
+type Props = ComponentProps<typeof Base>;
+const props = Astro.props;
+---
+<Base {...props}>
+  <slot name="head" slot="head" />
+  {/* Motion en premier enfant de <body> : le boot couvre la page avant le premier rendu. Possède aussi l'overlay CRT et sa bascule. */}
+  <Motion />
+  <a class="skip m" href="#contenu">Aller au contenu</a>
+  <TopBar />
+  <main id="contenu" tabindex="-1">
+    <slot />
+  </main>
+  <Footer />
+</Base>

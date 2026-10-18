@@ -1,0 +1,20 @@
+---
+// Conteneur du HTML produit par @nd/markdown (seul pipeline Markdown du projet).
+import '@nd/markdown/markdown.css';
+
+interface Props {
+  html: string;
+  id?: string;
+  /** Applique la préférence lecteur MONO/SANS mémorisée (billets uniquement). */
+  reader?: boolean;
+}
+const { html, id, reader = false } = Astro.props;
+---
+<div class="md-prose" id={id} set:html={html} />
+{
+  reader && id && (
+    <script is:inline define:vars={{ id }}>
+      try{if(localStorage.getItem('nd-read')==='sans')document.getElementById(id).classList.add('md-prose--sans')}catch(e){}
+    </script>
+  )
+}

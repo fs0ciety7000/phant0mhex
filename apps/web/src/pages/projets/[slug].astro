@@ -1,0 +1,126 @@
+---
+import Prose from '../../components/Prose.astro';
+import SignalLost from '../../components/SignalLost.astro';
+import Public from '../../layouts/Public.astro';
+import { createData } from '../../lib/data';
+import { PH, projectId } from '../../lib/format';
+import { fileUrl, thumbSrcset } from '../../lib/pb';
+import { renderMarkdown } from '../../lib/render';
+
+const slug = Astro.params.slug ?? '';
+const db = createData(Astro.locals);
+const projects = await db.projects();
+const down = Astro.locals.degraded;
+const i = projects.findIndex((p) => p.slug === slug);
+const project = i >= 0 ? projects[i] : undefined;
+if (!down && !project) return Astro.rewrite('/404');
+if (!project) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '30');
+}
+
+const html = project?.body?.trim() ? (await renderMarkdown(db, project.body)).html : '';
+const prev = i > 0 ? projects[i - 1] : undefined;
+const next = i >= 0 && i < projects.length - 1 ? projects[i + 1] : undefined;
+const cover = project?.cover ? fileUrl(project.collectionName, project.id, project.cover, '1920x0') : '';
+let host = '';
+try {
+  host = project?.url ? new URL(project.url).host : '';
+} catch {
+  host = '';
+}
+---
+<Public
+  title={project ? `${project.title} — Projets — Nicolas Dessenius` : 'Projet indisponible — Nicolas Dessenius'}
+  description={project?.summary || undefined}
+  canonical={`/projets/${slug}`}
+  noindex={!project}
+>
+  {
+    !project ? (
+      <SignalLost back={{ href: '/projets', label: 'PROJETS' }} />
+    ) : (
+      <article>
+        <header class="art-head band">
+          <nav class="crumbs m mu" aria-label="Fil d’Ariane">
+            <a href="/projets">[02] PROJETS</a>
+            <span aria-hidden="true">/</span>
+            <span class="ac tab">{projectId(i)}</span>
+          </nav>
+          <h1 class="macro art-title" data-split>
+            {project.title}
+          </h1>
+          {project.summary && <p class="art-lede">{project.summary}</p>}
+          <dl class="art-meta m">
+            <div>
+              <dt>ID</dt>
+              <dd class="ac tab">{projectId(i)}</dd>
+            </div>
+            <div>
+              <dt>RÔLE</dt>
+              <dd>{project.role || PH}</dd>
+            </div>
+            <div>
+              <dt>ANNÉE</dt>
+              <dd class="tab">{project.year || PH}</dd>
+            </div>
+            <div>
+              <dt>ACCÈS</dt>
+              <dd>
+                {host ? (
+                  <a href={project.url} target="_blank" rel="noopener">
+                    {host} <span class="ac">↗</span>
+                  </a>
+                ) : (
+                  PH
+                )}
+              </dd>
+            </div>
+          </dl>
+        </header>
+        {cover && (
+          <figure class="art-cover band">
+            <img
+              src={cover}
+              srcset={thumbSrcset(project.collectionName, project.id, project.cover)}
+              sizes="(min-width: 1440px) 1360px, 100vw"
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
+          </figure>
+        )}
+        <div class="art-body band">
+          <aside class="art-side m mu">
+            <div class="art-side-in">
+              <span>/// DOSSIER PROJET</span>
+            </div>
+          </aside>
+          <div class="art-main" data-reveal>
+            {html ? <Prose html={html} /> : <p class="m mu">[DESCRIPTION DU PROJET — CONTENU À VENIR]</p>}
+          </div>
+        </div>
+        <div class="band art-foot">
+        <nav class="prevnext m" aria-label="Projets voisins">
+          {prev ? (
+            <a href={`/projets/${prev.slug}`} rel="prev">
+              <span class="mu">&lt;&lt;&lt; PRÉCÉDENT</span>
+              <span class="t">{prev.title}</span>
+            </a>
+          ) : (
+            <span class="mu">&lt;&lt;&lt; DÉBUT DE L’INDEX</span>
+          )}
+          {next ? (
+            <a class="next" href={`/projets/${next.slug}`} rel="next">
+              <span class="mu">SUIVANT &gt;&gt;&gt;</span>
+              <span class="t">{next.title}</span>
+            </a>
+          ) : (
+            <span class="next mu">FIN DE L’INDEX &gt;&gt;&gt;</span>
+          )}
+        </nav>
+        </div>
+      </article>
+    )
+  }
+</Public>

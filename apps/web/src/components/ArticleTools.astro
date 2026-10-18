@@ -1,0 +1,91 @@
+---
+// Câblage léger des billets : copie [data-copy], façade YouTube [data-youtube], bascule lecteur MONO/SANS.
+// Idempotent : rejoué à chaque `astro:page-load` (View Transitions) sans double écouteur.
+---
+<script>
+  const KEY = 'nd-read';
+  const YT = /^[\w-]{11}$/;
+
+  function store(v?: string): string | null {
+    try {
+      if (v) localStorage.setItem(KEY, v);
+      return localStorage.getItem(KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  function applyReader(mode: string): void {
+    const prose = document.getElementById('prose');
+    prose?.classList.toggle('md-prose--sans', mode === 'sans');
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-reader]')) {
+      b.setAttribute('aria-pressed', String(b.dataset.reader === mode));
+    }
+  }
+
+  async function copy(btn: HTMLElement): Promise<void> {
+    let text = btn.dataset.copy ?? '';
+    if (!text) {
+      const host = btn.closest('figure, pre, [data-code], .md-code') ?? btn.parentElement;
+      text = host?.querySelector('code')?.textContent ?? '';
+    }
+    const label = btn.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'COPIÉ';
+    } catch {
+      btn.textContent = 'ÉCHEC';
+    }
+    setTimeout(() => {
+      btn.textContent = label;
+    }, 1500);
+  }
+
+  function youtube(el: HTMLElement): void {
+    const id = el.dataset.youtube ?? '';
+    if (!YT.test(id) || el.querySelector('iframe')) return;
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+    f.title = el.getAttribute('aria-label') ?? el.dataset.title ?? 'Vidéo YouTube';
+    f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    el.replaceChildren(f);
+  }
+
+  function init(): void {
+    if (!document.getElementById('prose')) return;
+    applyReader(store() === 'sans' ? 'sans' : 'mono');
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as Element | null;
+    const reader = t?.closest<HTMLElement>('[data-reader]');
+    if (reader) {
+      const mode = reader.dataset.reader === 'sans' ? 'sans' : 'mono';
+      store(mode);
+      applyReader(mode);
+      return;
+    }
+    const btn = t?.closest<HTMLElement>('[data-copy]');
+    if (btn) {
+      e.preventDefault();
+      void copy(btn);
+      return;
+    }
+    const yt = t?.closest<HTMLElement>('[data-youtube]');
+    if (yt) {
+      e.preventDefault();
+      youtube(yt);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    const yt = (e.target as Element | null)?.closest<HTMLElement>('[data-youtube]');
+    if (yt && (e.key === 'Enter' || e.key === ' ') && !(e.target instanceof HTMLButtonElement)) {
+      e.preventDefault();
+      youtube(yt);
+    }
+  });
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
