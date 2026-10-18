@@ -58,6 +58,9 @@ export const sanitizeSchema: SanitizeSchema = {
     div: extend('div', [
       ['className', 'md-embed', 'md-table'],
       ['dataYoutube', /^[\w-]{11}$/],
+      ['tabIndex', 0],
+      ['role', 'region'],
+      'ariaLabel',
     ]),
     figure: [['className', 'md-figure', 'md-figure--missing', 'md-code']],
     figcaption: [],
@@ -75,9 +78,6 @@ export const sanitizeSchema: SanitizeSchema = {
       ['className', 'md-figure', 'md-figure--missing'],
       ['style', SHIKI_SPAN_STYLE],
     ]),
-    pre: extend('pre', [
-      ['style', SHIKI_PRE_STYLE],
-      ['tabIndex', 0],
-    ]),
+    pre: extend('pre', [['style', SHIKI_PRE_STYLE], ['tabIndex', 0], ['role', 'region'], 'ariaLabel']),
   },
 };

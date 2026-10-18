@@ -2,6 +2,7 @@
 // Câblage léger des billets : copie [data-copy], façade YouTube [data-youtube], bascule lecteur MONO/SANS.
 // Idempotent : rejoué à chaque `astro:page-load` (View Transitions) sans double écouteur.
 ---
+<p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
 <script>
   const KEY = 'nd-read';
   const YT = /^[\w-]{11}$/;
@@ -30,14 +31,18 @@
       text = host?.querySelector('code')?.textContent ?? '';
     }
     const label = btn.textContent;
+    const status = document.querySelector<HTMLElement>('[data-copy-status]');
+    let ok = true;
     try {
       await navigator.clipboard.writeText(text);
-      btn.textContent = 'COPIÉ';
     } catch {
-      btn.textContent = 'ÉCHEC';
+      ok = false;
     }
+    btn.textContent = ok ? '[ COPIÉ ]' : '[ ÉCHEC ]';
+    if (status) status.textContent = ok ? 'Code copié dans le presse-papiers.' : 'La copie a échoué.';
     setTimeout(() => {
       btn.textContent = label;
+      if (status) status.textContent = '';
     }, 1500);
   }
 

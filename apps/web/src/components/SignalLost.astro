@@ -11,7 +11,7 @@ const { back } = Astro.props;
   <h1 class="macro" id="h-lost"><span class="ln" data-split>HORS<span class="ac">/</span></span><span class="ln" data-split>LIGNE</span></h1>
   <p class="art-lede">La base de contenu ne répond pas. Ce document est momentanément indisponible — réessayez dans quelques instants.</p>
   <div class="actions m">
-    <a class="btn" href={back.href}><span class="ac">&lt;&lt;&lt;</span> <span data-scramble>{back.label}</span></a>
+    <a class="btn" href={back.href}><span class="ac" aria-hidden="true">&lt;&lt;&lt;</span> <span data-scramble>{back.label}</span></a>
     <a class="btn" href="/"><span data-scramble>ACCUEIL</span></a>
   </div>
 </section>

@@ -205,7 +205,12 @@ export function rehypeTables() {
   return (tree: Root) => {
     visit(tree, 'element', (node, index, parent) => {
       if (node.tagName !== 'table' || parent === undefined || index === undefined) return;
-      parent.children[index] = el('div', { className: ['md-table'] }, [node]);
+      // Conteneur défilant : focusable et nommé pour le clavier et les lecteurs d'écran.
+      parent.children[index] = el(
+        'div',
+        { className: ['md-table'], tabIndex: 0, role: 'region', ariaLabel: 'Tableau' },
+        [node],
+      );
       return [SKIP, index + 1];
     });
   };
@@ -272,7 +277,9 @@ export function rehypeCode() {
     for (const { pre, code, parent, index } of blocks) {
       const lang = langOf(code);
       const title = parseTitle((code.data as { meta?: string } | undefined)?.meta);
-      pre.properties.tabIndex = 0; // bloc défilant : atteignable au clavier
+      const label = title ?? (lang ? `Code ${lang}` : 'Bloc de code');
+      // bloc défilant : atteignable au clavier et nommé
+      Object.assign(pre.properties, { tabIndex: 0, role: 'region', ariaLabel: label });
       let output: Element = pre;
 
       if (highlighter && lang && loaded.has(lang)) {
@@ -283,7 +290,12 @@ export function rehypeCode() {
         );
         if (highlighted) {
           // On ne garde que la couleur de fond/texte : classes et attributs Shiki inutiles ici.
-          highlighted.properties = { style: highlighted.properties.style, tabIndex: 0 };
+          highlighted.properties = {
+            style: highlighted.properties.style,
+            tabIndex: 0,
+            role: 'region',
+            ariaLabel: label,
+          };
           output = codeFigure(title ?? lang, highlighted);
         }
       } else if (title) {

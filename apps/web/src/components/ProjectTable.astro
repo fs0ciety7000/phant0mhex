@@ -7,31 +7,33 @@ interface Props {
 }
 const { projects } = Astro.props;
 ---
-<div class="ptable" role="list">
-  <div class="prow head m" aria-hidden="true">
-    <span>ID</span><span>NOM</span><span class="ty">RÔLE</span><span class="yr">ANNÉE</span><span class="go">ACCÈS</span>
-  </div>
+<div class="prow head m" aria-hidden="true">
+  <span>ID</span><span>NOM</span><span class="ty">RÔLE</span><span class="yr">ANNÉE</span><span class="go">ACCÈS</span>
+</div>
+<ul class="ptable">
   {
     projects.length > 0
       ? projects.map((p, i) => (
-          <a class="prow" role="listitem" href={`/projets/${p.slug}`} data-reveal>
-            <span class="m mu tab">{projectId(i)}</span>
-            <span class="nm">{p.title}</span>
-            <span class="ty m mu">{p.role || PH}</span>
-            <span class="yr m mu tab">{p.year || PH}</span>
-            <span class="go m">
-              DOSSIER <span class="arr">&gt;&gt;&gt;</span>
-            </span>
-          </a>
+          <li>
+            <a class="prow" href={`/projets/${p.slug}`} data-reveal>
+              <span class="m mu tab">{projectId(i)}</span>
+              <span class="nm">{p.title}</span>
+              <span class="ty m mu">{p.role || PH}</span>
+              <span class="yr m mu tab">{p.year || PH}</span>
+              <span class="go m">
+                DOSSIER <span class="arr" aria-hidden="true">&gt;&gt;&gt;</span>
+              </span>
+            </a>
+          </li>
         ))
       : [0, 1].map((i) => (
-          <div class="prow ph" role="listitem">
+          <li class="prow ph">
             <span class="m mu tab">{projectId(i)}</span>
             <span class="nm">[PROJET {String(i + 1).padStart(2, '0')}]</span>
             <span class="ty m mu">[RÔLE]</span>
             <span class="yr m mu tab">[ANNÉE]</span>
             <span class="go m mu">À VENIR</span>
-          </div>
+          </li>
         ))
   }
-</div>
+</ul>

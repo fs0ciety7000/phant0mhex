@@ -84,7 +84,7 @@ const { page, totalPages, totalItems, items } = result;
       search?.q && (
         <p class="m mu" role="status">
           /// <span class="tab">{pad(totalItems)}</span> RÉSULTAT{totalItems > 1 ? 'S' : ''} POUR «{' '}
-          <samp class="ac">{search.q}</samp> » — <a href="/journal">EFFACER</a>
+          <samp class="ac">{search.q}</samp> » — <a class="hit" href="/journal">EFFACER</a>
         </p>
       )
     }
