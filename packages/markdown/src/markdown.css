@@ -1,0 +1,466 @@
+/*
+ * ND-01 — rendu du pipeline Markdown (@nd/markdown).
+ * À appliquer sur le conteneur du HTML rendu : <div class="md-prose">…</div>
+ * (modificateur .md-prose--sans : corps en var(--f-read)).
+ * Tokens attendus (packages/tokens) : --bg --surface --line --muted --fg --fg-soft --accent
+ * --f-macro --f-mono --f-read. Rayon 0 partout.
+ */
+
+.md-prose {
+  counter-reset: md-h2;
+  max-width: 68ch;
+  font-family: var(--f-mono);
+  font-size: 15px;
+  line-height: 1.75;
+  letter-spacing: 0.005em;
+  color: var(--fg-soft);
+  overflow-wrap: break-word;
+}
+
+.md-prose--sans {
+  font-family: var(--f-read);
+  font-size: 17px;
+  letter-spacing: 0;
+}
+
+.md-prose *,
+.md-prose *::before,
+.md-prose *::after {
+  border-radius: 0;
+}
+
+.md-prose > :first-child {
+  margin-top: 0;
+}
+
+.md-prose p,
+.md-prose ul,
+.md-prose ol,
+.md-prose dl {
+  margin: 0 0 20px;
+}
+
+.md-prose ul,
+.md-prose ol {
+  padding-left: 1.5em;
+}
+
+.md-prose li + li {
+  margin-top: 6px;
+}
+
+.md-prose ul > li::marker {
+  color: var(--accent);
+  content: "+  ";
+}
+
+.md-prose ol > li::marker {
+  color: var(--accent);
+}
+
+.md-prose strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.md-prose hr {
+  margin: 48px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- Titres ---------------------------------------------------------------- */
+
+.md-prose h1,
+.md-prose h2,
+.md-prose h3,
+.md-prose h4,
+.md-prose h5,
+.md-prose h6 {
+  scroll-margin-top: calc(var(--bar, 52px) + 16px);
+  color: var(--fg);
+}
+
+.md-prose h2 {
+  counter-increment: md-h2;
+  margin: 48px 0 16px;
+  font-family: var(--f-macro);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.md-prose h2::before {
+  content: counter(md-h2, decimal-leading-zero) " / ";
+  color: var(--accent);
+}
+
+/* Titre caché des notes de bas de page (GFM) : pas de numéro. */
+.md-prose h2.sr-only {
+  counter-increment: none;
+}
+
+.md-prose h2.sr-only::before {
+  content: none;
+}
+
+.md-prose h3 {
+  margin: 36px 0 12px;
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.md-prose h3::before {
+  content: ">>> ";
+  color: var(--accent);
+}
+
+.md-prose h4,
+.md-prose h5,
+.md-prose h6 {
+  margin: 28px 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.md-anchor {
+  margin-left: 0.4em;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0;
+}
+
+.md-prose :is(h1, h2, h3, h4, h5, h6):hover .md-anchor,
+.md-anchor:focus-visible {
+  opacity: 1;
+}
+
+.md-anchor:hover {
+  color: var(--accent);
+}
+
+/* ---- Liens ----------------------------------------------------------------- */
+
+.md-prose a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.md-prose a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.md-prose a[target="_blank"]::after {
+  content: " ↗";
+  color: var(--muted);
+}
+
+.md-prose a:focus-visible,
+.md-prose button:focus-visible,
+.md-prose pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Citations, encarts ---------------------------------------------------- */
+
+.md-prose blockquote {
+  margin: 32px 0;
+  padding: 20px 24px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.md-prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.md-callout {
+  margin: 32px 0;
+  padding: 20px 24px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.md-prose .md-callout > :last-child {
+  margin-bottom: 0;
+}
+
+.md-callout__label {
+  margin: 0 0 8px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.md-callout__label::before {
+  content: "[ ";
+}
+
+.md-callout__label::after {
+  content: " ]";
+}
+
+/* Bande d'alerte en tête de l'encart (le texte reste sur fond uni). */
+.md-callout--warning {
+  padding-top: 30px;
+  background-image: repeating-linear-gradient(-45deg, var(--accent) 0 8px, transparent 8px 16px);
+  background-size: 100% 6px;
+  background-repeat: no-repeat;
+}
+
+/* ---- Code ------------------------------------------------------------------ */
+
+.md-prose code {
+  font-family: var(--f-mono);
+  font-size: 0.9em;
+}
+
+.md-prose :not(pre) > code {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.md-prose pre {
+  margin: 0 0 28px;
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg-soft);
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.md-prose pre code {
+  font-size: inherit;
+}
+
+.md-code {
+  margin: 0 0 28px;
+  border: 1px solid var(--line);
+}
+
+.md-code figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.md-code figcaption > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.md-code pre {
+  margin: 0;
+  border: 0;
+}
+
+.md-code__copy {
+  flex: none;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.md-code__copy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Figures, médias ------------------------------------------------------- */
+
+.md-prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.md-figure {
+  margin: 0 0 28px;
+}
+
+.md-figure img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.md-figure figcaption {
+  margin-top: 10px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.md-figure--missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  border: 1px dashed var(--accent);
+  background: var(--surface);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+span.md-figure--missing {
+  display: inline;
+  min-height: 0;
+  padding: 0 4px;
+}
+
+.md-embed {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 28px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  background-color: var(--surface);
+  background-image: radial-gradient(circle, var(--line) 1px, transparent 1.4px);
+  background-size: 6px 6px;
+}
+
+.md-embed > button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--fg);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.md-embed > button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.md-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ---- Tableaux -------------------------------------------------------------- */
+
+.md-table {
+  margin: 0 0 28px;
+  overflow-x: auto;
+}
+
+.md-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.md-table th,
+.md-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.md-table th {
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.md-table [align="center"] {
+  text-align: center;
+}
+
+.md-table [align="right"] {
+  text-align: right;
+}
+
+/* ---- Listes de tâches, notes ----------------------------------------------- */
+
+.md-prose .contains-task-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.md-prose .task-list-item::marker {
+  content: none;
+}
+
+.md-prose .task-list-item input {
+  margin-right: 8px;
+  accent-color: var(--accent);
+}
+
+.md-prose .footnotes {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.md-prose .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
