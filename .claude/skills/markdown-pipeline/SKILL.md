@@ -11,7 +11,7 @@ description: Modifier le rendu Markdown (packages/markdown) partagé par le site
 
 ## Chaîne
 
-remark-parse → remark-gfm → remark-directive (+ handlers maison) → remark-rehype → rehype-slug → rehype-autolink-headings → Shiki (thème ND-01 : monochrome + `#FF2A2A`) → plugin `media` → rehype-sanitize (schéma maison) → stringify.
+remark-parse → remark-gfm → remark-directive (+ handlers maison) → remark-rehype → slug maison (accents → ASCII) → rehype-autolink-headings → Shiki core + moteur regex JS (thème ND-01, chargé à la demande) → plugin `media` → rehype-sanitize (schéma maison, en dernier : styles Shiki filtrés par regex) → stringify.
 
 ## Syntaxes maison
 
@@ -19,7 +19,7 @@ remark-parse → remark-gfm → remark-directive (+ handlers maison) → remark-
 |---|---|
 | `:::note` / `:::warning` … `:::` | encart bordure rouge 4px, fond `--surface` |
 | `![alt](media:<id>)` | `<figure><img srcset>` depuis les miniatures PocketBase, `width`/`height`, `loading="lazy"`, `<figcaption>` = légende du média |
-| `::youtube{id=…}` | iframe nocookie, chargée au clic |
+| `::youtube{id=…}` | façade `[data-youtube]` (bouton), iframe nocookie montée au clic par le site |
 | ```` ```ts title="loop.ts" ```` | bloc de code avec barre titre + bouton copier |
 
 ## Règles
