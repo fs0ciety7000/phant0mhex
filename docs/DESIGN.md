@@ -24,7 +24,7 @@ Rayon : `0` partout. Pas de dégradé décoratif, pas d'ombre douce, pas de tran
 | Macro (titres) | Archivo Black | `clamp(2.6rem, 10.4vw, 12.5rem)` (token `--fs-macro` : « DESSENIUS » tient sur une ligne à 375 px), interlignage 0.86, approche −0.045em, CAPITALES |
 | H2 | Archivo Black | 30px, 1, −0.02em, CAPITALES, préfixe rouge `01 /` |
 | Micro (méta, nav) | JetBrains Mono | 11px, 1.3, +0.1em, CAPITALES |
-| Corps (billets) | JetBrains Mono | 15px, 1.75, mesure ≤ 68ch (question ouverte : sans-serif ?) |
+| Corps (billets) | JetBrains Mono | 15px, 1.75, mesure ≤ 68ch ; bascule lecteur SANS (IBM Plex Sans, `.md-prose--sans`) mémorisée |
 | Disruption | EB Garamond italique | rarissime, idéalement tramé en WebGL |
 
 ## Grammaire
