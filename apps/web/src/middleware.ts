@@ -1,6 +1,7 @@
 // En-têtes HTTP du site : Cache-Control (docs/ARCHITECTURE.md §5) + sécurité (CSP, etc.).
-import { createHash } from 'node:crypto';
+
 import { defineMiddleware } from 'astro:middleware';
+import { createHash } from 'node:crypto';
 import { pbOrigin } from './lib/pb';
 
 /** Pages SSR publiques : CDN 5 min, servi périmé jusqu'à 24 h pendant la revalidation ; purge à la publication. */

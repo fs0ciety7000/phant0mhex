@@ -34,7 +34,9 @@ export function fileUrl(collection: string, recordId: string, filename: string, 
 /** `srcset` à partir des miniatures PocketBase (480/960/1920 px de large). */
 export function thumbSrcset(collection: string, recordId: string, filename: string): string {
   if (!filename) return '';
-  return MEDIA_THUMBS.map((t) => `${fileUrl(collection, recordId, filename, t)} ${t.split('x')[0]}w`).join(', ');
+  return MEDIA_THUMBS.map((t) => `${fileUrl(collection, recordId, filename, t)} ${t.split('x')[0]}w`).join(
+    ', ',
+  );
 }
 
 /** Origine de PocketBase (pour la CSP). */
@@ -51,4 +53,4 @@ export function isNotFound(err: unknown): boolean {
 }
 
 /** Filtre public des billets visibles (doublé côté règles PocketBase). */
-export const PUBLISHED_FILTER = 'status = "published" && published_at <= @now';
+export const PUBLISHED_FILTER = 'status = "published" && published_at != "" && published_at <= @now';

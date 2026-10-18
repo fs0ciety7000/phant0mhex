@@ -101,7 +101,11 @@ export function createData(locals: App.Locals) {
       lookup<Project>('project', () => pb.collection('projects').getFirstListItem(bySlug(slug))),
 
     categories: () =>
-      safe<Category[]>('categories', () => pb.collection('categories').getFullList({ sort: 'order,name' }), []),
+      safe<Category[]>(
+        'categories',
+        () => pb.collection('categories').getFullList({ sort: 'order,name' }),
+        [],
+      ),
 
     tags: () => safe<Tag[]>('tags', () => pb.collection('tags').getFullList({ sort: 'name' }), []),
 
@@ -122,7 +126,13 @@ export function createData(locals: App.Locals) {
           }),
         [] as Post[],
       );
-      return rows.map((p, i) => ({ id: p.id, slug: p.slug, title: p.title, published_at: p.published_at, no: i + 1 }));
+      return rows.map((p, i) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        published_at: p.published_at,
+        no: i + 1,
+      }));
     },
 
     /**

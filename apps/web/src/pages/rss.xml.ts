@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createData } from '../lib/data';
-import { escapeXml as x, rfc822 } from '../lib/format';
+import { rfc822, escapeXml as x } from '../lib/format';
 
 /** RSS 2.0 — 20 derniers billets publiés. */
 export const GET: APIRoute = async ({ locals, site, url }) => {

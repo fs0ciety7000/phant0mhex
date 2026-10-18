@@ -4,8 +4,8 @@ import SignalLost from '../../components/SignalLost.astro';
 import Public from '../../layouts/Public.astro';
 import { createData } from '../../lib/data';
 import { PH, projectId } from '../../lib/format';
-import { renderMarkdown } from '../../lib/render';
 import { fileUrl, thumbSrcset } from '../../lib/pb';
+import { renderMarkdown } from '../../lib/render';
 
 const slug = Astro.params.slug ?? '';
 const db = createData(Astro.locals);

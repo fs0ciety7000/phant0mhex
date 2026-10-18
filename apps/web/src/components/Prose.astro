@@ -1,10 +1,6 @@
 ---
 // Conteneur du HTML produit par @nd/markdown (seul pipeline Markdown du projet).
-import '../styles/prose.css';
-
-// Import « gardé » de la feuille du pipeline Markdown : chargée si elle existe, ignorée sinon.
-// TODO(markdown) : remplacer par `import '@nd/markdown/markdown.css'` dès que l'export est publié.
-import.meta.glob('../../../../packages/markdown/{,src/,styles/,dist/}markdown.css', { eager: true });
+import '@nd/markdown/markdown.css';
 
 interface Props {
   html: string;

@@ -27,7 +27,12 @@ function valid(iso: string | undefined): Date | null {
 }
 
 const LONG = new Intl.DateTimeFormat('fr-BE', { dateStyle: 'long', timeZone: TZ });
-const SHORT = new Intl.DateTimeFormat('fr-BE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: TZ });
+const SHORT = new Intl.DateTimeFormat('fr-BE', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: TZ,
+});
 
 /** « 18 octobre 2026 » */
 export function dateLong(iso: string | undefined): string {
