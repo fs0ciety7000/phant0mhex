@@ -78,7 +78,7 @@ docs/                  ARCHITECTURE.md, DESIGN.md, ADR/
 
 | Collection | Champs principaux | Règles |
 |---|---|---|
-| `editors` (auth) | email, name, avatar · **MFA OTP activée** | aucune inscription publique |
+| `editors` (auth) | email, name, avatar · MFA OTP **désactivée temporairement** (migration `1792290000`, pas de SMTP) | aucune inscription publique |
 | `categories` | name, slug (unique), description, order | lecture publique · écriture éditeurs |
 | `tags` | name, slug (unique) | idem |
 | `posts` | title, slug (unique), excerpt, body (markdown), cover (file), category → categories, tags → tags[], status (`draft`/`scheduled`/`published`), published_at, reading_time, seo_title, seo_description, featured, revision | lecture publique **seulement** si `status = "published" && published_at <= @now` ; écriture éditeurs |

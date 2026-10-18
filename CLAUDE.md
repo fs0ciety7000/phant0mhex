@@ -54,3 +54,4 @@ pnpm e2e                      # Playwright (PW_CHROMIUM_PATH=/opt/pw-browsers/ch
 
 - `PUBLIC_PB_URL` n'est pas connu au build Docker : côté serveur il est lu dans `process.env` à l'exécution (`src/lib/pb.ts`) ; côté navigateur (admin), le passer depuis la page Astro (prop ou `data-*`), jamais via `import.meta.env`.
 - Biome lint aussi les `.astro` : les variables du frontmatter sont exemptées via `overrides` dans `biome.json`.
+- MFA des éditeurs **désactivée temporairement** (migration `1792290000_disable_editors_mfa.js`) faute de SMTP. Une fois le SMTP configuré dans PocketBase, la réactiver par une NOUVELLE migration et remettre le test MFA de `e2e/pb-visibility.spec.ts`.

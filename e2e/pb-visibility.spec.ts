@@ -128,12 +128,15 @@ test.describe('editors', () => {
     expect([400, 403]).toContain(res.status());
   });
 
-  test('le mot de passe seul ne suffit pas (MFA)', async () => {
+  // MFA désactivée temporairement (migration 1792290000) tant qu'aucun SMTP n'est configuré.
+  test('connexion éditeur par mot de passe (MFA désactivée)', async () => {
     const res = await anon.post('/api/collections/editors/auth-with-password', {
       data: { identity: `${RUN}@example.test`, password: EDITOR_PASSWORD },
     });
-    expect(res.status()).toBe(401);
-    expect((await res.json()).mfaId).toBeTruthy();
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.token).toBeTruthy();
+    expect(body.mfaId).toBeUndefined();
   });
 
   test('un anonyme ne liste pas les éditeurs', async () => {
