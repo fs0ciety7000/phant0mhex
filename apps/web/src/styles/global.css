@@ -7,16 +7,37 @@
 html {
   background: var(--bg);
   color: var(--fg);
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--f-mono);
   font-size: 13px;
+  line-height: 1.5;
   letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+::selection {
+  background: var(--accent);
+  color: var(--bg);
 }
 a {
   color: inherit;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+button,
+input {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
 }
 :focus-visible {
   outline: 2px solid var(--accent);

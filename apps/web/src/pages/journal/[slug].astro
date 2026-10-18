@@ -1,0 +1,205 @@
+---
+import ArticleTools from '../../components/ArticleTools.astro';
+import Prose from '../../components/Prose.astro';
+import SignalLost from '../../components/SignalLost.astro';
+import Public from '../../layouts/Public.astro';
+import { createData } from '../../lib/data';
+import { dateLong, isoDate, logId, PH, pad } from '../../lib/format';
+import { fileUrl, thumbSrcset } from '../../lib/pb';
+import { renderMarkdown } from '../../lib/render';
+
+const slug = Astro.params.slug ?? '';
+const db = createData(Astro.locals);
+const [found, index] = await Promise.all([db.post(slug), db.logIndex()]);
+if (found.state === 'missing') return Astro.rewrite('/404');
+const post = found.state === 'ok' ? found.value : undefined;
+if (!post) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '30');
+}
+
+const md = post ? await renderMarkdown(db, post.body ?? '') : undefined;
+const pos = post ? index.findIndex((e) => e.id === post.id) : -1;
+const no = pos >= 0 ? index[pos]?.no : undefined;
+const log = logId(no);
+const older = pos > 0 ? index[pos - 1] : undefined;
+const newer = pos >= 0 ? index[pos + 1] : undefined;
+const toc = (md?.toc ?? []).filter((t) => t.depth >= 2 && t.depth <= 3);
+const minutes = post?.reading_time || md?.readingTime || 0;
+const category = post?.expand?.category;
+const tags = post?.expand?.tags ?? [];
+const cover = post?.cover ? fileUrl(post.collectionName, post.id, post.cover, '1920x0') : '';
+const origin = (Astro.site ?? Astro.url).origin;
+const url = `${origin}/journal/${slug}`;
+const title = post ? post.seo_title || post.title : 'Billet indisponible';
+const description = post ? post.seo_description || post.excerpt || undefined : undefined;
+
+const jsonLd = post
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: description ?? '',
+      datePublished: isoDate(post.published_at),
+      dateModified: isoDate(post.updated),
+      inLanguage: 'fr',
+      url,
+      mainEntityOfPage: url,
+      image: `${origin}/og/${post.slug}.png`,
+      author: { '@type': 'Person', name: 'Nicolas Dessenius', url: `${origin}/` },
+      ...(category ? { articleSection: category.name } : {}),
+      ...(tags.length ? { keywords: tags.map((t) => t.name).join(', ') } : {}),
+      ...(minutes ? { timeRequired: `PT${minutes}M` } : {}),
+    }
+  : undefined;
+---
+<Public
+  title={`${title} — Journal — Nicolas Dessenius`}
+  description={description}
+  canonical={`/journal/${slug}`}
+  image={`/og/${slug}.png`}
+  type="article"
+  jsonLd={jsonLd}
+  noindex={!post}
+  publishedTime={post ? isoDate(post.published_at) : undefined}
+  modifiedTime={post ? isoDate(post.updated) : undefined}
+>
+  {
+    !post || !md ? (
+      <SignalLost back={{ href: '/journal', label: 'JOURNAL' }} />
+    ) : (
+      <article aria-labelledby="h-art">
+        <div class="progress" aria-hidden="true" />
+        <header class="art-head band">
+          <nav class="crumbs m mu" aria-label="Fil d’Ariane">
+            <a href="/journal">[03] JOURNAL</a>
+            {category && (
+              <>
+                <span aria-hidden="true">/</span>
+                <a href={`/journal/categorie/${category.slug}`}>{category.name}</a>
+              </>
+            )}
+            <span aria-hidden="true">/</span>
+            <span class="ac tab">{log}</span>
+          </nav>
+          <h1 class="macro art-title" id="h-art">
+            {post.title}
+          </h1>
+          {post.excerpt && <p class="art-lede">{post.excerpt}</p>}
+          {(category || tags.length > 0) && (
+            <ul class="chips sm m" aria-label="Catégorie et étiquettes">
+              {category && (
+                <li>
+                  <a href={`/journal/categorie/${category.slug}`}>
+                    <span class="ac">[</span>
+                    {category.name}
+                    <span class="ac">]</span>
+                  </a>
+                </li>
+              )}
+              {tags.map((t) => (
+                <li>
+                  <a href={`/journal/tag/${t.slug}`}>#{t.name}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <dl class="art-meta m">
+            <div>
+              <dt>IDENTIFIANT</dt>
+              <dd class="ac tab">{log}</dd>
+            </div>
+            <div>
+              <dt>PUBLIÉ</dt>
+              <dd>
+                <time datetime={isoDate(post.published_at)}>{dateLong(post.published_at)}</time>
+              </dd>
+            </div>
+            <div>
+              <dt>LECTURE</dt>
+              <dd class="tab">{minutes ? `${minutes} MIN` : PH}</dd>
+            </div>
+            <div>
+              <dt>RÉVISION</dt>
+              <dd class="tab">REV {pad(post.revision || 1, 2)}</dd>
+            </div>
+          </dl>
+        </header>
+
+        {cover && (
+          <figure class="art-cover band">
+            <img
+              src={cover}
+              srcset={thumbSrcset(post.collectionName, post.id, post.cover)}
+              sizes="(min-width: 1440px) 1360px, 100vw"
+              alt=""
+              fetchpriority="high"
+              decoding="async"
+            />
+          </figure>
+        )}
+
+        <div class="art-body band">
+          <aside class="art-side m" aria-label="Outils de lecture">
+            <div class="art-side-in">
+              <div class="reader" role="group" aria-label="Police de lecture">
+                <span class="mu">/// LECTURE</span>
+                <div class="opts">
+                  <button class="btn m" type="button" data-reader="mono" aria-pressed="true">
+                    MONO
+                  </button>
+                  <button class="btn m" type="button" data-reader="sans" aria-pressed="false">
+                    SANS
+                  </button>
+                </div>
+              </div>
+              {toc.length > 0 && (
+                <nav class="toc" aria-label="Sommaire">
+                  <span class="mu">/// SOMMAIRE</span>
+                  <ol>
+                    {toc.map((t, i) => (
+                      <li class={`d${t.depth}`}>
+                        <a href={`#${t.id}`}>
+                          <span class="n tab">{pad(i + 1, 2)}</span>
+                          <span>{t.text}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+            </div>
+          </aside>
+          <div class="art-main">
+            <Prose html={md.html} id="prose" reader />
+            <p class="m mu art-end">
+              /// FIN DE TRANSMISSION — <span class="ac tab">{log}</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="band art-foot">
+          <nav class="prevnext m" aria-label="Billets voisins">
+            {older ? (
+              <a href={`/journal/${older.slug}`} rel="prev">
+                <span class="mu">&lt;&lt;&lt; PRÉCÉDENT · {logId(older.no)}</span>
+                <span class="t">{older.title}</span>
+              </a>
+            ) : (
+              <span class="mu">&lt;&lt;&lt; PREMIER BILLET</span>
+            )}
+            {newer ? (
+              <a class="next" href={`/journal/${newer.slug}`} rel="next">
+                <span class="mu">{logId(newer.no)} · SUIVANT &gt;&gt;&gt;</span>
+                <span class="t">{newer.title}</span>
+              </a>
+            ) : (
+              <span class="next mu">DERNIER BILLET &gt;&gt;&gt;</span>
+            )}
+          </nav>
+        </div>
+        <ArticleTools />
+      </article>
+    )
+  }
+</Public>

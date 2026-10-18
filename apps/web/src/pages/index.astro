@@ -1,6 +1,186 @@
 ---
-import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import ProjectTable from '../components/ProjectTable.astro';
+import Prose from '../components/Prose.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Hero3D from '../islands/hero3d/Hero3D.astro';
+import Public from '../layouts/Public.astro';
+import { createData, logNo } from '../lib/data';
+import { pad, ph } from '../lib/format';
+import { renderMarkdown } from '../lib/render';
+
+const db = createData(Astro.locals);
+const [site, projects, latest, index] = await Promise.all([
+  db.site(),
+  db.projects(),
+  db.posts({ perPage: 3 }),
+  db.logIndex(),
+]);
+
+const bio = site?.bio?.trim() ? (await renderMarkdown(db, site.bio)).html : '';
+const email = site?.email?.trim() ?? '';
+const socials = (Array.isArray(site?.socials) ? site.socials : []).filter((s) => s?.label && s?.url);
+const base = ph(site?.base, '[VILLE] — BE');
+const availability = ph(site?.availability, '[DISPONIBILITÉ]');
+const origin = (Astro.site ?? Astro.url).origin;
+
+const marquee = '/// SYSTÈMES DE JEU /// CODE /// GAME DESIGN /// PROTOTYPAGE /// OUTILS /// TEMPS RÉEL /// ';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Nicolas Dessenius',
+  jobTitle: 'Lead développeur / game designer',
+  url: `${origin}/`,
+  ...(email ? { email: `mailto:${email}` } : {}),
+  ...(socials.length ? { sameAs: socials.map((s) => s.url) } : {}),
+};
 ---
-<Base title="Nicolas Dessenius">
-  <main><h1>Nicolas Dessenius</h1></main>
-</Base>
+<Public title="Nicolas Dessenius — lead dev & game designer" canonical="/" jsonLd={jsonLd} boot>
+  <!-- [00] HERO -->
+  <section class="hero" aria-label="Présentation">
+    <div class="band">
+      <div class="hero-grid">
+        <div class="hero-meta m">
+          <div class="head">
+            <span class="mu">[00] INDEX — REV 0.1</span>
+            <p class="lede">Systèmes de jeu, outils et expériences interactives. Conçus, codés, livrés.</p>
+          </div>
+          <dl class="spec">
+            <div><dt>UNITÉ</dt><dd>ND-01</dd></div>
+            <div><dt>FONCTION</dt><dd>LEAD DEV / GAME DESIGNER</dd></div>
+            <div><dt>BASE</dt><dd>{base}</dd></div>
+            <div><dt>STATUT</dt><dd>{availability}</dd></div>
+          </dl>
+        </div>
+        <div class="hero-stage">
+          <Hero3D />
+          <span class="xh a" aria-hidden="true"></span><span class="xh b" aria-hidden="true"></span>
+          <span class="xh c" aria-hidden="true"></span><span class="xh d" aria-hidden="true"></span>
+          <div class="hud tl m mu" aria-hidden="true">[ OBJ / MONOLITHE-01 ]<br />RENDU : DITHER BAYER 8×8</div>
+          <div class="hud tr m mu tab" aria-hidden="true">UNIT / ND-01<br />50.85N / 4.35E</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-title band">
+      <h1 class="macro" aria-label="Nicolas Dessenius">
+        <span class="ln" aria-hidden="true" data-split>NICOLAS/</span>
+        <span class="ln" aria-hidden="true" data-split>DESSENIUS</span>
+      </h1>
+      <div class="role m"><span>LEAD DEV ////// GAME DESIGNER</span><span aria-hidden="true">DÉFILER ▼</span></div>
+    </div>
+  </section>
+
+  <div class="stripe" aria-hidden="true">
+    <div class="hazard"></div>
+    <div class="marq"><span>{marquee}</span><span>{marquee}</span></div>
+    <div class="hazard"></div>
+  </div>
+
+  <!-- [01] DOSSIER -->
+  <section class="sec band" id="dossier" aria-labelledby="h-dos">
+    <SectionHead idx="01" title="DOSSIER" id="h-dos">
+      <Fragment slot="note">FICHE TECHNIQUE<br />ND-01 / A</Fragment>
+    </SectionHead>
+    <div class="dos">
+      <div class="dos-l">
+        <p class="serif-dither" data-reveal>Jouer est une affaire <em>sérieuse.</em></p>
+        <div class="bio" data-reveal>
+          {
+            bio ? (
+              <Prose html={bio} />
+            ) : (
+              <>
+                <p>Lead développeur et game designer. Je conçois des systèmes de jeu et je les code jusqu’à ce qu’ils tiennent en main.</p>
+                <p class="mu">[BIO — PARCOURS, STUDIOS, JEUX LIVRÉS]</p>
+              </>
+            )
+          }
+        </div>
+      </div>
+      <dl class="dos-r sheet m" data-reveal>
+        <div class="hd"><dt>SPÉCIFICATIONS</dt><dd>REV 0.1</dd></div>
+        <div><dt>RÔLE</dt><dd>LEAD DEV / GAME DESIGNER</dd></div>
+        <div><dt>DOMAINES</dt><dd>GAMEPLAY / OUTILS / WEB INTERACTIF</dd></div>
+        <div><dt>MOTEURS</dt><dd>[UNITY / UNREAL / GODOT…]</dd></div>
+        <div><dt>LANGAGES</dt><dd>[C# / C++ / TS…]</dd></div>
+        <div><dt>BASE</dt><dd>{base}</dd></div>
+        <div><dt>STATUT</dt><dd>{availability}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- [02] PROJETS -->
+  <section class="sec band" id="projets" aria-labelledby="h-pro">
+    <SectionHead idx="02" title="PROJETS" id="h-pro" red>
+      <Fragment slot="note">INDEX<br /><span class="tab">{pad(projects.length)}</span> ENTRÉES</Fragment>
+    </SectionHead>
+    <ProjectTable projects={projects} />
+    <div class="jhead after m mu">
+      <span>/// INDEX COMPLET</span>
+      <a href="/projets"><span data-scramble>TOUS LES PROJETS</span> <span class="ac">&gt;&gt;&gt;</span></a>
+    </div>
+  </section>
+
+  <!-- [03] JOURNAL -->
+  <section class="sec band" id="journal" aria-labelledby="h-jou">
+    <SectionHead idx="03" title="JOURNAL" id="h-jou">
+      <Fragment slot="note">BILLETS<br />DERNIERS ENVOIS</Fragment>
+    </SectionHead>
+    <div class="jhead m mu">
+      <span>/// {latest.items.length ? 'DERNIERS BILLETS PUBLIÉS' : 'AUCUN BILLET PUBLIÉ — CONTENU À VENIR'}</span>
+      <a href="/journal" class="btn"><span data-scramble>TOUT LE JOURNAL</span> <span class="ac">&gt;&gt;&gt;</span></a>
+    </div>
+    <div class="jgrid">
+      {
+        latest.items.length
+          ? latest.items.map((p, i) => <PostCard post={p} no={logNo(index, p.id)} rank={i + 1} />)
+          : [1, 2, 3].map((r) => <PostCard rank={r} />)
+      }
+    </div>
+  </section>
+
+  <!-- [04] CANAL -->
+  <section class="sec band" id="canal" aria-labelledby="h-can">
+    <div class="rule r" data-reveal></div>
+    <header class="sec-h">
+      <span class="idx m ac">[04]</span>
+      <span class="note m mu">CANAL OUVERT<br />E-MAIL DIRECT</span>
+    </header>
+    <h2 class="macro canal-big" id="h-can"><span class="ln" data-split>PARLONS<span class="ac">.</span></span></h2>
+    <div class="cgrid">
+      <div class="cmail">
+        <span class="m mu">ADRESSE DIRECTE</span>
+        {
+          email ? (
+            <a class="addr" href={`mailto:${email}`}>
+              {email}
+            </a>
+          ) : (
+            <span class="addr mu">[CONTACT]@DESSENIUS.BE</span>
+          )
+        }
+        <span class="m mu">&gt;&gt;&gt; PAS DE FORMULAIRE. UN E-MAIL SUFFIT.</span>
+      </div>
+      <ul class="clinks m" aria-label="Réseaux">
+        {
+          socials.length
+            ? socials.map((s) => (
+                <li>
+                  <a href={s.url} target="_blank" rel="noopener me">
+                    <span data-scramble>{s.label}</span>
+                    <span class="ac" aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))
+            : ['[GITHUB]', '[LINKEDIN]', '[ITCH.IO]'].map((l) => (
+                <li class="l">
+                  <span>{l}</span>
+                  <span aria-hidden="true">↗</span>
+                </li>
+              ))
+        }
+      </ul>
+    </div>
+  </section>
+</Public>

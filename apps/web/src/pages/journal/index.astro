@@ -1,0 +1,38 @@
+---
+import JournalList from '../../components/JournalList.astro';
+import Public from '../../layouts/Public.astro';
+import { createData, pageParam } from '../../lib/data';
+
+const db = createData(Astro.locals);
+const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 80);
+const page = pageParam(Astro.url);
+
+const [result, categories, index] = await Promise.all([
+  db.posts({
+    page,
+    // Liaison de paramètres PocketBase : jamais de concaténation de l'entrée utilisateur.
+    where: q ? (f) => f('title ~ {:q} || excerpt ~ {:q}', { q }) : undefined,
+  }),
+  db.categories(),
+  db.logIndex(),
+]);
+if (result.totalItems > 0 && page > result.totalPages) return Astro.rewrite('/404');
+const canonical = page > 1 && !q ? `/journal?page=${page}` : '/journal';
+---
+<Public
+  title={q ? `Recherche « ${q} » — Journal — Nicolas Dessenius` : 'Journal — Nicolas Dessenius'}
+  description="Journal de Nicolas Dessenius : game design, développement, outils, post-mortems."
+  canonical={canonical}
+  noindex={Boolean(q)}
+>
+  <JournalList
+    title="JOURNAL"
+    kicker="INDEX"
+    result={result}
+    index={index}
+    categories={categories}
+    basePath="/journal"
+    search={{ q }}
+    degraded={Astro.locals.degraded}
+  />
+</Public>

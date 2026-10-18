@@ -1,0 +1,18 @@
+---
+interface Props {
+  idx: string;
+  title: string;
+  id?: string;
+  /** h1 sur les pages d'index, h2 sur l'accueil. */
+  level?: 1 | 2;
+  red?: boolean;
+}
+const { idx, title, id, level = 2, red = false } = Astro.props;
+const Tag = level === 1 ? 'h1' : 'h2';
+---
+<div class:list={['rule', { r: red }]} data-reveal></div>
+<header class="sec-h">
+  <span class="idx m ac">[{idx}]</span>
+  <Tag class="macro" id={id}><span class="ln" data-split>{title}</span></Tag>
+  <span class="note m mu"><slot name="note" /></span>
+</header>

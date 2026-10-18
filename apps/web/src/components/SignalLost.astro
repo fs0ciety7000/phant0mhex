@@ -1,0 +1,17 @@
+---
+// Page de repli quand PocketBase est injoignable sur une page de détail (réponse 503, jamais mise en cache).
+interface Props {
+  back: { href: string; label: string };
+}
+const { back } = Astro.props;
+// Le statut 503 + Retry-After est posé par la page appelante (frontmatter), avant le rendu.
+---
+<section class="lost band" aria-labelledby="h-lost">
+  <span class="m ac">[503] / SIGNAL PERDU</span>
+  <h1 class="macro" id="h-lost"><span class="ln" data-split>HORS<span class="ac">/</span></span><span class="ln" data-split>LIGNE</span></h1>
+  <p class="art-lede">La base de contenu ne répond pas. Ce document est momentanément indisponible — réessayez dans quelques instants.</p>
+  <div class="actions m">
+    <a class="btn" href={back.href}><span class="ac">&lt;&lt;&lt;</span> <span data-scramble>{back.label}</span></a>
+    <a class="btn" href="/"><span data-scramble>ACCUEIL</span></a>
+  </div>
+</section>

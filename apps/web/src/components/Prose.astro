@@ -1,0 +1,24 @@
+---
+// Conteneur du HTML produit par @nd/markdown (seul pipeline Markdown du projet).
+import '../styles/prose.css';
+
+// Import « gardé » de la feuille du pipeline Markdown : chargée si elle existe, ignorée sinon.
+// TODO(markdown) : remplacer par `import '@nd/markdown/markdown.css'` dès que l'export est publié.
+import.meta.glob('../../../../packages/markdown/{,src/,styles/,dist/}markdown.css', { eager: true });
+
+interface Props {
+  html: string;
+  id?: string;
+  /** Applique la préférence lecteur MONO/SANS mémorisée (billets uniquement). */
+  reader?: boolean;
+}
+const { html, id, reader = false } = Astro.props;
+---
+<div class="md-prose" id={id} set:html={html} />
+{
+  reader && id && (
+    <script is:inline define:vars={{ id }}>
+      try{if(localStorage.getItem('nd-read')==='sans')document.getElementById(id).classList.add('md-prose--sans')}catch(e){}
+    </script>
+  )
+}

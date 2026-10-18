@@ -1,0 +1,39 @@
+---
+import { clock } from '../lib/format';
+
+const path = Astro.url.pathname;
+const links = [
+  { n: '01', label: 'DOSSIER', href: '/#dossier', match: null },
+  { n: '02', label: 'PROJETS', href: '/projets', match: '/projets' },
+  { n: '03', label: 'JOURNAL', href: '/journal', match: '/journal' },
+  { n: '04', label: 'CANAL', href: '/#canal', match: null },
+];
+const t = clock();
+const degraded = Astro.locals.degraded;
+---
+<header class="topbar">
+  <div class="topbar-row band m">
+    <a class="logo" href="/" aria-label="Nicolas Dessenius, accueil">ND<sup>®</sup></a>
+    <nav class="nav" aria-label="Navigation principale">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            aria-current={l.match && (path === l.match || path.startsWith(`${l.match}/`)) ? 'page' : undefined}
+          >
+            <b><span class="br">[</span>{l.n}<span class="br">]</span></b> <span data-scramble>{l.label}</span>
+          </a>
+        ))
+      }
+    </nav>
+    <div class="tele">
+      <span class="t-sys"><span class="dot" aria-hidden="true"></span>SYS ONLINE</span>
+      {degraded && <span class="t-deg mu">DONNÉES [HORS LIGNE]</span>}
+      <span class="t-coord mu tab">50.85N / 4.35E</span>
+      <span class="t-clock tab"><time datetime={t.iso} data-clock>{t.hms}</time> <span class="mu">{t.zone}</span></span>
+      <button class="crt-btn m" type="button" data-crt aria-pressed="true" aria-label="Effet CRT">
+        CRT <span class="crt-state" data-crt-state>ON</span>
+      </button>
+    </div>
+  </div>
+</header>
