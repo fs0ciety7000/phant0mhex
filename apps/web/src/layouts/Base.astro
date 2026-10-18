@@ -68,7 +68,6 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : '';
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=EB+Garamond:ital@1&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
     />
-    <script is:inline>try{if(localStorage.getItem('nd-crt')==='off')document.documentElement.classList.add('crt-off')}catch(e){}</script>
     {ld && <script is:inline type="application/ld+json" set:html={ld} />}
     <slot name="head" />
   </head>

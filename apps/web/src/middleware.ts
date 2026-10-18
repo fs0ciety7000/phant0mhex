@@ -79,12 +79,12 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
   const isHtml = headers.get('Content-Type')?.includes('text/html') ?? false;
   if (!isHtml) {
-    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    return new Response(res.body, { status: res.status, headers });
   }
 
   const html = await res.text();
   // En dev, Vite injecte ses propres scripts : CSP uniquement en production.
   if (import.meta.env.PROD) headers.set('Content-Security-Policy', csp(inlineScriptHashes(html)));
   headers.delete('Content-Length');
-  return new Response(html, { status: res.status, statusText: res.statusText, headers });
+  return new Response(html, { status: res.status, headers });
 });

@@ -12,15 +12,12 @@ const props = Astro.props;
 ---
 <Base {...props}>
   <slot name="head" slot="head" />
+  {/* Motion en premier enfant de <body> : le boot couvre la page avant le premier rendu. Possède aussi l'overlay CRT et sa bascule. */}
+  <Motion />
   <a class="skip m" href="#contenu">Aller au contenu</a>
   <TopBar />
   <main id="contenu" tabindex="-1">
     <slot />
   </main>
   <Footer />
-  <div class="crt-scan" aria-hidden="true"></div>
-  <div class="crt-noise" aria-hidden="true"></div>
-  <Motion />
-  {/* Bascule CRT (< 1 Ko) : état mémorisé dans localStorage, réappliqué après un swap de View Transitions. */}
-  <script is:inline>(function(){var d=document.documentElement,k='nd-crt';function s(){var o=d.classList.contains('crt-off');document.querySelectorAll('[data-crt]').forEach(function(b){b.setAttribute('aria-pressed',String(!o));var t=b.querySelector('[data-crt-state]');if(t)t.textContent=o?'OFF':'ON'})}function r(){try{d.classList.toggle('crt-off',localStorage.getItem(k)==='off')}catch(e){}s()}r();if(window.__ndcrt)return;window.__ndcrt=1;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-crt]');if(!b)return;var o=!d.classList.contains('crt-off');d.classList.toggle('crt-off',o);try{localStorage.setItem(k,o?'off':'on')}catch(x){}s()});document.addEventListener('astro:after-swap',r)})();</script>
 </Base>
