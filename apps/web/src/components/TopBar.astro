@@ -27,8 +27,19 @@ const degraded = Astro.locals.degraded;
       }
     </nav>
     <div class="tele">
-      <span class="t-sys"><span class="dot" aria-hidden="true"></span>SYS ONLINE</span>
-      {degraded && <span class="t-deg mu">DONNÉES [HORS LIGNE]</span>}
+      {
+        degraded ? (
+          <span class="t-sys t-sys--deg" role="status">
+            <span class="dot dot--deg" aria-hidden="true" />
+            SYS DÉGRADÉ
+          </span>
+        ) : (
+          <span class="t-sys">
+            <span class="dot" aria-hidden="true" />
+            SYS ONLINE
+          </span>
+        )
+      }
       <span class="t-coord mu tab">50.85N / 4.35E</span>
       <span class="t-scroll mu tab">DÉF <output data-scroll-pct>000</output>%</span>
       <span class="t-clock tab"><time datetime={t.iso} data-clock>{t.hms}</time> <span class="mu">{t.zone}</span></span>

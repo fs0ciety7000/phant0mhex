@@ -97,7 +97,7 @@ const jsonLd = {
       <dl class="dos-r sheet m" data-reveal>
         <div class="hd"><dt>SPÉCIFICATIONS</dt><dd>REV 0.1</dd></div>
         <div><dt>RÔLE</dt><dd>LEAD DEV / GAME DESIGNER</dd></div>
-        <div><dt>DOMAINES</dt><dd>GAMEPLAY / OUTILS / WEB INTERACTIF</dd></div>
+        <div><dt>DOMAINES</dt><dd>[DOMAINES]</dd></div>
         <div><dt>MOTEURS</dt><dd>[UNITY / UNREAL / GODOT…]</dd></div>
         <div><dt>LANGAGES</dt><dd>[C# / C++ / TS…]</dd></div>
         <div><dt>BASE</dt><dd>{base}</dd></div>
@@ -114,7 +114,7 @@ const jsonLd = {
     <ProjectTable projects={projects} />
     <div class="jhead after m mu">
       <span>/// INDEX COMPLET</span>
-      <a href="/projets"><span data-scramble>TOUS LES PROJETS</span> <span class="ac">&gt;&gt;&gt;</span></a>
+      <a class="hit" href="/projets"><span data-scramble>TOUS LES PROJETS</span>&nbsp;<span class="ac" aria-hidden="true">&gt;&gt;&gt;</span></a>
     </div>
   </section>
 
@@ -125,7 +125,7 @@ const jsonLd = {
     </SectionHead>
     <div class="jhead m mu">
       <span>/// {latest.items.length ? 'DERNIERS BILLETS PUBLIÉS' : 'AUCUN BILLET PUBLIÉ — CONTENU À VENIR'}</span>
-      <a href="/journal" class="btn"><span data-scramble>TOUT LE JOURNAL</span> <span class="ac">&gt;&gt;&gt;</span></a>
+      <a href="/journal" class="btn"><span data-scramble>TOUT LE JOURNAL</span> <span class="ac" aria-hidden="true">&gt;&gt;&gt;</span></a>
     </div>
     <div class="jgrid">
       {

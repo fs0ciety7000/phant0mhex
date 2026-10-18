@@ -8,6 +8,6 @@ exports[`document complet > snapshot 1`] = `
 </blockquote>
 <aside class="md-callout md-callout--note"><p class="md-callout__label">NOTE</p><p>Encart.</p></aside>
 <figure class="md-figure"><img src="/t/960.jpg" srcset="/t/480.jpg 480w, /t/960.jpg 960w, /t/1920.jpg 1920w" sizes="(max-width: 760px) 100vw, 760px" width="1600" height="900" alt="Alt du média" loading="lazy" decoding="async"><figcaption>Fig. 01 — Légende</figcaption></figure>
-<figure class="md-code"><figcaption><span>player.gd</span><button type="button" class="md-code__copy" data-copy>[ COPIER ]</button></figcaption><pre style="background-color:#121212;color:#D6D6D6" tabindex="0"><code><span><span style="color:#FF2A2A">func</span><span style="color:#EAEAEA"> _ready</span><span style="color:#8C8C8C">():</span></span>
+<figure class="md-code"><figcaption><span>player.gd</span><button type="button" class="md-code__copy" data-copy>[ COPIER ]</button></figcaption><pre style="background-color:#121212;color:#D6D6D6" tabindex="0" role="region" aria-label="player.gd"><code><span><span style="color:#FF2A2A">func</span><span style="color:#EAEAEA"> _ready</span><span style="color:#8C8C8C">():</span></span>
 <span><span style="color:#FF2A2A">	pass</span><span style="color:#8C8C8C"> # rien</span></span></code></pre></figure>"
 `;

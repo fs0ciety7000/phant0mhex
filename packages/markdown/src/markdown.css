@@ -152,7 +152,7 @@
 .md-prose a {
   color: var(--fg);
   text-decoration: underline;
-  text-decoration-color: var(--line);
+  text-decoration-color: var(--muted);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
@@ -290,8 +290,10 @@
 
 .md-code__copy {
   flex: none;
-  min-height: 28px;
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
   border: 1px solid var(--line);
   background: none;
   color: var(--fg);

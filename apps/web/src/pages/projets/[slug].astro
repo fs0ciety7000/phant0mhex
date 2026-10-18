@@ -68,8 +68,8 @@ try {
               <dt>ACCÈS</dt>
               <dd>
                 {host ? (
-                  <a href={project.url} target="_blank" rel="noopener">
-                    {host} <span class="ac">↗</span>
+                  <a class="hit" href={project.url} target="_blank" rel="noopener">
+                    {host}&nbsp;<span class="ac" aria-hidden="true">↗</span>
                   </a>
                 ) : (
                   PH
@@ -96,7 +96,7 @@ try {
               <span>/// DOSSIER PROJET</span>
             </div>
           </aside>
-          <div class="art-main" data-reveal>
+          <div class="art-main">
             {html ? <Prose html={html} /> : <p class="m mu">[DESCRIPTION DU PROJET — CONTENU À VENIR]</p>}
           </div>
         </div>

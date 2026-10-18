@@ -22,6 +22,14 @@ export function runBoot(signal: AbortSignal): Promise<void> {
   const bar = boot.querySelector<HTMLElement>('[data-boot-bar]');
   const skip = boot.querySelector<HTMLButtonElement>('[data-boot-skip]');
   const timers: number[] = [];
+  // Pendant le boot, le reste de la page est inerte (ni focus ni lecteur d'écran derrière l'overlay).
+  const behind = Array.from(
+    document.querySelectorAll<HTMLElement>('#contenu, [data-topbar], body > footer, .footer'),
+  );
+  const setInert = (on: boolean) => {
+    for (const el of behind) el.inert = on;
+  };
+  setInert(true);
   const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
 
   return new Promise<void>((resolve) => {
@@ -34,7 +42,10 @@ export function runBoot(signal: AbortSignal): Promise<void> {
       } catch {
         /* stockage indisponible : le boot rejouera, sans gravité */
       }
+      const hadFocus = document.activeElement === skip;
       root.classList.remove('nd-booting');
+      setInert(false);
+      if (hadFocus) document.getElementById('contenu')?.focus({ preventScroll: true });
       boot.classList.add('is-out');
       later(() => {
         boot.hidden = true;
@@ -55,6 +66,7 @@ export function runBoot(signal: AbortSignal): Promise<void> {
     signal.addEventListener('abort', () => {
       for (const t of timers) clearTimeout(t);
       root.classList.remove('nd-booting');
+      setInert(false);
       boot.hidden = true;
       resolve();
     });

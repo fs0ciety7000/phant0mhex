@@ -19,7 +19,7 @@ const href = post ? `/journal/${post.slug}` : undefined;
     <article class="card" data-reveal>
       <div class="meta m">
         {cat ? (
-          <a class="ac" href={`/journal/categorie/${cat.slug}`}>
+          <a class="ac hit" href={`/journal/categorie/${cat.slug}`}>
             [{cat.name}]
           </a>
         ) : (
@@ -40,7 +40,7 @@ const href = post ? `/journal/${post.slug}` : undefined;
       <div class="foot m">
         <span class="mu tab">{logId(no)}</span>
         <a class="btn" href={href} aria-label={`Lire « ${post.title} »`}>
-          <span data-scramble>LIRE</span> <span class="ac">&gt;&gt;&gt;</span>
+          <span data-scramble>LIRE</span> <span class="ac" aria-hidden="true">&gt;&gt;&gt;</span>
         </a>
       </div>
     </article>

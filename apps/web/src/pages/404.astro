@@ -8,13 +8,13 @@ const path = Astro.url.pathname;
   <section class="lost band" aria-labelledby="h-404">
     <span class="m ac">[404] / ADRESSE INCONNUE</span>
     <h1 class="macro" id="h-404"><span class="ln" data-split>404<span class="ac">.</span></span></h1>
-    <dl class="spec m" style="max-width:560px">
+    <dl class="spec m">
       <div><dt>REQUÊTE</dt><dd><samp>{path}</samp></dd></div>
       <div><dt>STATUT</dt><dd>AUCUN DOCUMENT À CETTE ADRESSE</dd></div>
     </dl>
     <p class="art-lede">Le document demandé n’existe pas, ou n’est pas (encore) publié.</p>
     <div class="actions m">
-      <a class="btn" href="/"><span class="ac">&lt;&lt;&lt;</span> <span data-scramble>ACCUEIL</span></a>
+      <a class="btn" href="/"><span class="ac" aria-hidden="true">&lt;&lt;&lt;</span> <span data-scramble>ACCUEIL</span></a>
       <a class="btn" href="/journal"><span data-scramble>JOURNAL</span></a>
       <a class="btn" href="/projets"><span data-scramble>PROJETS</span></a>
     </div>

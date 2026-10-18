@@ -25,7 +25,7 @@
     try { if (localStorage.getItem('nd-crt') === 'off') d.classList.add('nd-crt-off'); } catch (e) {}
     if (rm) return;
     d.classList.add('nd-hold');
-    setTimeout(function () { d.classList.remove('nd-hold'); }, 3000);
+    setTimeout(function () { d.classList.remove('nd-hold'); }, 1200);
     if (!seen && document.body && document.body.hasAttribute('data-boot')) {
       document.getElementById('nd-boot').hidden = false;
       d.classList.add('nd-booting');
@@ -69,7 +69,7 @@
   }
 
   /* --- Attente des états initiaux GSAP (le script inline lève ce verrou au plus tard après 3 s) --- */
-  html.nd-hold [data-split],
+  html.nd-hold [data-split]:not([data-hero] h1 *),
   html.nd-hold [data-reveal] {
     visibility: hidden;
   }
@@ -148,7 +148,10 @@
     letter-spacing: inherit;
     background: none;
     border: 1px solid var(--line);
-    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
     cursor: pointer;
   }
   .nd-boot-skip:hover {

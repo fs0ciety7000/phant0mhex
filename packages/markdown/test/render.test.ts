@@ -111,7 +111,7 @@ describe('code', () => {
   it('bloc avec title → figure.md-code + couleurs nd-01', async () => {
     const out = await html('```ts title="loop.ts"\n// commentaire\nconst x = "s";\n```');
     expect(out).toMatch(
-      /^<figure class="md-code"><figcaption><span>loop\.ts<\/span><button type="button" class="md-code__copy" data-copy>\[ COPIER \]<\/button><\/figcaption><pre style="background-color:#121212;color:#D6D6D6" tabindex="0"><code>/,
+      /^<figure class="md-code"><figcaption><span>loop\.ts<\/span><button type="button" class="md-code__copy" data-copy>\[ COPIER \]<\/button><\/figcaption><pre style="background-color:#121212;color:#D6D6D6" tabindex="0" role="region" aria-label="loop\.ts"><code>/,
     );
     expect(out).toContain('<span style="color:#FF2A2A">const</span>');
     expect(out).toContain('<span style="color:#8C8C8C">// commentaire</span>');
@@ -145,14 +145,16 @@ describe('code', () => {
 
   it('langage inconnu → <pre><code> brut, échappé', async () => {
     expect(await html('```cobol\nplain <b>\n```')).toBe(
-      '<pre tabindex="0"><code class="language-cobol">plain &#x3C;b>\n</code></pre>',
+      '<pre tabindex="0" role="region" aria-label="Code cobol"><code class="language-cobol">plain &#x3C;b>\n</code></pre>',
     );
   });
 
   it('langage inconnu avec title → figure sans coloration', async () => {
     const out = await html('```cobol title="a.cob"\nx\n```');
     expect(out).toContain('<figcaption><span>a.cob</span>');
-    expect(out).toContain('<pre tabindex="0"><code class="language-cobol">x\n</code></pre>');
+    expect(out).toContain(
+      '<pre tabindex="0" role="region" aria-label="a.cob"><code class="language-cobol">x\n</code></pre>',
+    );
   });
 
   it('pas de typographie française dans le code', async () => {
@@ -240,7 +242,7 @@ describe('tableaux', () => {
   it('enveloppés dans div.md-table', async () => {
     const out = await html('| a | b |\n|---|--:|\n| 1 | 2 |');
     expect(out).toMatchInlineSnapshot(`
-      "<div class="md-table"><table>
+      "<div class="md-table" tabindex="0" role="region" aria-label="Tableau"><table>
       <thead>
       <tr>
       <th>a</th>
