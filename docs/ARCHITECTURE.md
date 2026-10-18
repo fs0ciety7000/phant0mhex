@@ -65,7 +65,7 @@ apps/
 packages/
   markdown/            pipeline unified partagé (site + aperçu admin)
   tokens/              tokens.css + tokens.ts du design system
-  pb-types/            types générés depuis le schéma (pocketbase-typegen)
+  pb-types/            types TS des collections (maintenus à la main, alignés sur les migrations)
 assets/3d/             sources .blend (Git LFS) + scripts d'export
 docker-compose.yml     dev local (web + pb)
 docs/                  ARCHITECTURE.md, DESIGN.md, ADR/
@@ -158,7 +158,6 @@ Recherche dans le journal : filtre PocketBase (`title ~ q || body ~ q`) via un e
 - Cloudflare Access sur `pb.dessenius.be/_/*`.
 - Ne pas toucher aux enregistrements mail (MX, SPF, DKIM, DMARC) ni à `mariage`, `elodie`, `grace`, `wedding`.
 
-> ⚠️ **Conflit à trancher** : `dessenius.be` et `www` sont actuellement attachés à une autre app Coolify (repo `fs0ciety7000/dessenius.be`, en ligne). Un projet Coolify « Dessenius.be » contient déjà un service PocketBase sans domaine. Voir les questions ouvertes.
 
 ---
 
@@ -170,12 +169,12 @@ Recherche dans le journal : filtre PocketBase (`title ~ q || body ~ q`) via un e
 
 ---
 
-## 10. Questions ouvertes (à valider)
+## 10. Décisions (validées le 2026-10-18)
 
-1. **Domaine** : remplacer l'app actuelle sur `dessenius.be` (repo `fs0ciety7000/dessenius.be`) par ce projet ? La garder sur un sous-domaine ? Utiliser un sous-domaine de staging (`next.dessenius.be`) en attendant ?
-2. **PocketBase existant** (projet Coolify « Dessenius.be ») : le remplacer par l'image versionnée de ce repo (recommandé : migrations et hooks dans Git) ou le réutiliser ?
-3. **Astro plutôt que Next.js** : OK ?
-4. **Corps des billets en monospace** (cohérence terminal) ou une sans-serif de lecture pour le long format ?
-5. **Formulaire de contact** (Turnstile + envoi d'e-mail) ou simple `mailto:` ?
-6. **Langues** : FR uniquement, ou FR/EN ?
-7. Contenu à fournir : bio, liste des projets (rôle, année, visuels), liens sociaux, e-mail de contact.
+1. **Domaine** : l'ancienne app sur `dessenius.be` est supprimée → ce projet prend `dessenius.be` et `www`.
+2. **PocketBase** : l'image versionnée de ce repo remplace le service PocketBase existant du projet Coolify « Dessenius.be » (supprimé une fois le nouveau en ligne).
+3. **Astro** validé (pas Next.js).
+4. **Corps des billets** : monospace par défaut, avec une bascule lecteur « sans-serif » (IBM Plex Sans), mémorisée dans le navigateur.
+5. **Contact** : simple lien `mailto:` (pas de formulaire).
+6. **Langue** : français uniquement.
+7. **Contenu** (bio, projets, liens, e-mail) : fourni plus tard ; placeholders `[…]` en attendant, éditables depuis l'admin (`site`, `projects`).

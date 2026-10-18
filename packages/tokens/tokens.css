@@ -1,0 +1,29 @@
+/* ND-01 — Tactical Telemetry. Source de vérité des valeurs : docs/DESIGN.md */
+:root {
+  --bg: #0b0b0b;
+  --surface: #121212;
+  --line: #2a2a2a;
+  --muted: #8c8c8c;
+  --fg: #eaeaea;
+  --fg-soft: #d6d6d6;
+  --accent: #ff2a2a;
+  --ok: #4af626; /* réservé au voyant SYS ONLINE */
+
+  --f-macro: "Archivo Black", "Arial Black", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, monospace;
+  --f-serif: "EB Garamond", Georgia, serif;
+  --f-read: "IBM Plex Sans", system-ui, sans-serif; /* option lecture sans-serif */
+
+  --fs-macro: clamp(2.6rem, 10.4vw, 12.5rem);
+  --fs-h2: clamp(1.6rem, 2.4vw, 1.9rem);
+  --fs-micro: 0.6875rem;
+  --fs-body: 0.9375rem;
+
+  --lh-macro: 0.86;
+  --ls-macro: -0.045em;
+  --ls-micro: 0.1em;
+
+  --gutter: clamp(16px, 3vw, 40px);
+  --bar: 52px;
+  --maxw: 1440px;
+}

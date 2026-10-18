@@ -8,4 +8,4 @@ Tu travailles dans `apps/pb` et `packages/pb-types`. Suis le skill `pocketbase-s
 - Une migration par changement, avec `down`. Règles d'accès dans la migration.
 - Hooks en JSVM PocketBase (pas de npm). Une purge Cloudflare qui échoue ne bloque jamais une sauvegarde.
 - Dockerfile : image Alpine minimale, binaire PocketBase en version épinglée et vérifiée (checksum), `pb_migrations` et `pb_hooks` copiés, données dans `/pb/pb_data` (volume), utilisateur non root, healthcheck `/api/health`.
-- Après changement : `pnpm --filter pb-types gen`, tests e2e de visibilité (brouillon et billet programmé invisibles en anonyme).
+- Après changement : mise à jour de `packages/pb-types`, tests e2e de visibilité (brouillon et billet programmé invisibles en anonyme).

@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/.astro
+apps/pb/pb_data
+prototypes
+.git
+test-results
+playwright-report

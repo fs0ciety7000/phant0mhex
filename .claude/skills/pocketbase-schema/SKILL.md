@@ -11,7 +11,7 @@ Source de vérité : `docs/ARCHITECTURE.md` §4.
 
 - Toute modification de schéma = **nouvelle migration** JS dans `apps/pb/pb_migrations/<timestamp>_<verbe>_<objet>.js` avec `up` **et** `down`. Ne jamais éditer une migration déjà déployée.
 - Générer une migration de départ : modifier en local dans le dashboard (`http://localhost:8090/_/`) avec `--automigrate`, puis relire et nettoyer le fichier généré.
-- Après migration : `pnpm --filter pb-types gen`, puis `pnpm typecheck`.
+- Après migration : mettre à jour `packages/pb-types/src/index.ts`, puis `pnpm typecheck`.
 - Règles d'accès : écrire-les dans la migration. Lecture publique de `posts` = `status = "published" && published_at <= @now` ; toute écriture = `@request.auth.collectionName = "editors"`.
 - `editors` : pas de `createRule` publique ; MFA (OTP) activée.
 
