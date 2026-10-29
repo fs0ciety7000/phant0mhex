@@ -41,10 +41,10 @@ function mount(host: HTMLElement): () => void {
       if (!entries.some((e) => e.isIntersecting)) return;
       io.disconnect();
       host.dataset.state = 'loading';
-      import('./HeroMonolith')
-        .then(({ createHeroMonolith }) => {
+      import('./HeroBelfry')
+        .then(({ createHeroBelfry }) => {
           if (!alive) return;
-          const inst = createHeroMonolith({
+          const inst = createHeroBelfry({
             container: stage,
             hud: { fps, rot: q('rot'), sweep: q('sweep'), px: q('px') },
             getInput: () => heroState.get(),

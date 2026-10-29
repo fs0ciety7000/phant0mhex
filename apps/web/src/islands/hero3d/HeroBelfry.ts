@@ -1,9 +1,9 @@
 /**
- * Monolithe hero : dalle 1:4:9 (proportions 1.12 × 2.52 × 0.28), anneau de points, cube satellite,
- * grille au sol, balayage vertical. Rendu deux passes (scène → RT [R = luminance, G = accent] → trame Bayer 8×8).
- * Port fidèle de prototypes/motion-lab/index.html.
+ * Hero : le Beffroi de Mons, silhouette procédurale (trois ordres superposés, tourelles d'angle, bulbe,
+ * lanterne et flèche), arêtes au trait, anneau de points (le carillon), grille au sol, balayage vertical.
+ * Rendu deux passes (scène → RT [R = luminance, G = accent] → trame Bayer 8×8), repris de prototypes/motion-lab.
  *
- * Géométrie procédurale pour l'instant ; voir assets/3d/README.md pour brancher un GLB Blender.
+ * Géométrie procédurale ; voir assets/3d/README.md pour brancher un GLB Blender.
  */
 import {
   BoxGeometry,
@@ -11,11 +11,15 @@ import {
   BufferGeometry,
   Color,
   ColorManagement,
+  CylinderGeometry,
+  EdgesGeometry,
   GridHelper,
   Group,
+  LatheGeometry,
   LinearSRGBColorSpace,
+  LineBasicMaterial,
+  LineSegments,
   Mesh,
-  MeshBasicMaterial,
   OrthographicCamera,
   PerspectiveCamera,
   PlaneGeometry,
@@ -24,12 +28,12 @@ import {
   Scene,
   ShaderMaterial,
   Vector2,
-  Vector3,
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { deg, fmtSweep, POSTER_TIME, rotY, sweepAt } from './poster';
-import { monolithFragment, monolithVertex, postFragment, postVertex } from './shaders';
+import { belfryFragment, belfryVertex, postFragment, postVertex } from './shaders';
 
 export interface HeroInput {
   scroll: number;
@@ -70,7 +74,113 @@ export interface HeroInstance {
 const FG = 0xeaeaea;
 const BG = 0x0b0b0b;
 const ACCENT = 0xff2a2a;
-const HALF = new Vector3(0.56, 1.26, 0.14);
+/** Pied du beffroi, posé sur la grille. */
+const GROUND = -1.75;
+/** Échelle globale : la flèche s'arrête sous le bord haut du cadre. */
+const SCALE = 0.84;
+
+/** Profil de bulbe (rayon, hauteur) normalisé : base, panse, col, pointe. */
+const BULB: [number, number][] = [
+  [0.82, 0],
+  [1, 0.16],
+  [0.96, 0.36],
+  [0.62, 0.62],
+  [0.3, 0.84],
+  [0.16, 1],
+];
+
+function bulb(radius: number, height: number, y: number, segments = 8): BufferGeometry {
+  const g = new LatheGeometry(
+    BULB.map(([r, h]) => new Vector2(r * radius, h * height)),
+    segments,
+  );
+  g.translate(0, y, 0);
+  return g;
+}
+
+function box(w: number, h: number, d: number, x: number, y: number, z: number): BufferGeometry {
+  const g = new BoxGeometry(w, h, d);
+  g.translate(x, y + h / 2, z);
+  return g;
+}
+
+function cyl(r: number, h: number, y: number, segments = 8, x = 0, z = 0): BufferGeometry {
+  const g = new CylinderGeometry(r, r, h, segments);
+  g.rotateY(Math.PI / segments);
+  g.translate(x, y + h / 2, z);
+  return g;
+}
+
+function cone(r: number, h: number, y: number, x = 0, z = 0): BufferGeometry {
+  const g = new CylinderGeometry(0, r, h, 6);
+  g.translate(x, y + h / 2, z);
+  return g;
+}
+
+/**
+ * Beffroi en unités locales (pied à y = 0) : trois niveaux en retrait séparés de corniches,
+ * pilastres d'angle et baies sur chaque face, quatre tourelles, tambour octogonal, bulbe,
+ * lanterne, petit bulbe et flèche. Facettes octogonales assumées : la trame 1-bit les lit mieux que du lisse.
+ */
+function buildBelfry(): BufferGeometry {
+  const parts: BufferGeometry[] = [];
+  const tiers = [
+    { w: 0.86, h: 0.85 },
+    { w: 0.8, h: 0.7 },
+    { w: 0.74, h: 0.62 },
+  ];
+  let y = 0;
+  for (const [i, t] of tiers.entries()) {
+    parts.push(box(t.w, t.h, t.w, 0, y, 0));
+    const half = t.w / 2;
+    // Pilastres d'angle.
+    for (const sx of [-1, 1])
+      for (const sz of [-1, 1]) parts.push(box(0.07, t.h, 0.07, sx * (half - 0.02), y, sz * (half - 0.02)));
+    // Baies : un cadre en saillie au centre de chaque face (deux par face au niveau du bas).
+    const bays = i === 0 ? [-0.17, 0.17] : [0];
+    const bw = i === 0 ? 0.16 : 0.2;
+    const bh = t.h * 0.55;
+    const by = y + t.h * 0.22;
+    for (const o of bays) {
+      parts.push(box(bw, bh, 0.02, o, by, half + 0.01));
+      parts.push(box(bw, bh, 0.02, o, by, -half - 0.01));
+      parts.push(box(0.02, bh, bw, half + 0.01, by, o));
+      parts.push(box(0.02, bh, bw, -half - 0.01, by, o));
+    }
+    y += t.h;
+    const cw = i === tiers.length - 1 ? t.w + 0.1 : t.w + 0.08;
+    const ch = i === tiers.length - 1 ? 0.06 : 0.05;
+    parts.push(box(cw, ch, cw, 0, y, 0));
+    y += ch;
+  }
+  // Tourelles d'angle : fût, petit bulbe, aiguille.
+  const c = 0.33;
+  for (const sx of [-1, 1])
+    for (const sz of [-1, 1]) {
+      parts.push(cyl(0.06, 0.2, y, 8, sx * c, sz * c));
+      const tb = bulb(0.075, 0.18, y + 0.2);
+      tb.translate(sx * c, 0, sz * c);
+      parts.push(tb);
+      parts.push(cone(0.012, 0.12, y + 0.38, sx * c, sz * c));
+    }
+  // Tambour, bulbe principal, lanterne, petit bulbe, flèche.
+  parts.push(cyl(0.3, 0.22, y));
+  y += 0.22;
+  parts.push(bulb(0.36, 0.55, y));
+  y += 0.55;
+  parts.push(cyl(0.1, 0.18, y));
+  y += 0.18;
+  parts.push(bulb(0.12, 0.2, y));
+  y += 0.2;
+  parts.push(cone(0.016, 0.22, y));
+
+  const merged = mergeGeometries(parts.map((g) => g.toNonIndexed()));
+  for (const g of parts) g.dispose();
+  if (!merged) throw new Error('beffroi : fusion des géométries impossible');
+  merged.scale(SCALE, SCALE, SCALE);
+  merged.translate(0, GROUND, 0);
+  return merged;
+}
 
 /** PRNG déterministe : l'anneau est identique entre poster et live. */
 function mulberry32(seed: number) {
@@ -86,7 +196,7 @@ function mulberry32(seed: number) {
 
 const ZERO: HeroInput = { scroll: 0, mx: 0, my: 0 };
 
-export function createHeroMonolith(opts: HeroOptions): HeroInstance {
+export function createHeroBelfry(opts: HeroOptions): HeroInstance {
   const { container, hud = {}, getInput = () => ZERO, still = false } = opts;
   const mobile = matchMedia('(pointer: coarse), (max-width: 767px)').matches;
   const dpr = opts.pixelRatio ?? Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2);
@@ -113,18 +223,24 @@ export function createHeroMonolith(opts: HeroOptions): HeroInstance {
   const rig = new Group();
   scene.add(rig);
 
-  const monoMat = new ShaderMaterial({
+  const towerMat = new ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
       uSweep: { value: 0 },
       uCam: { value: camera.position },
-      uHalf: { value: HALF },
     },
-    vertexShader: monolithVertex,
-    fragmentShader: monolithFragment,
+    vertexShader: belfryVertex,
+    fragmentShader: belfryFragment,
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 1,
   });
-  const monoGeo = new BoxGeometry(HALF.x * 2, HALF.y * 2, HALF.z * 2);
-  rig.add(new Mesh(monoGeo, monoMat));
+  const towerGeo = buildBelfry();
+  rig.add(new Mesh(towerGeo, towerMat));
+  // Arêtes au trait (R = 1) : la silhouette reste lisible malgré la trame.
+  const edgeGeo = new EdgesGeometry(towerGeo, 24);
+  const edgeMat = new LineBasicMaterial({ color: new Color(1, 0, 0) });
+  rig.add(new LineSegments(edgeGeo, edgeMat));
 
   const N = 180;
   const rand = mulberry32(0x4e4401);
@@ -140,17 +256,13 @@ export function createHeroMonolith(opts: HeroOptions): HeroInstance {
   ringGeo.setAttribute('position', new BufferAttribute(pos, 3));
   const ringMat = new PointsMaterial({ color: new Color(0, 1, 0), size: 3 * dpr, sizeAttenuation: false });
   const ring = new Points(ringGeo, ringMat);
+  ring.position.y = 0.55; // à hauteur de la chambre des cloches
   ring.rotation.x = 0.32;
   ring.rotation.z = -0.12;
   rig.add(ring);
 
-  const satGeo = new BoxGeometry(0.11, 0.11, 0.11);
-  const satMat = new MeshBasicMaterial({ color: new Color(1, 1, 0) });
-  const sat = new Mesh(satGeo, satMat);
-  scene.add(sat);
-
   const grid = new GridHelper(18, 24, new Color(0, 0.55, 0), new Color(0, 0.38, 0));
-  grid.position.y = -1.75;
+  grid.position.y = GROUND;
   scene.add(grid);
 
   /* ---- post : tramage ordonné 1-bit ---- */
@@ -187,18 +299,12 @@ export function createHeroMonolith(opts: HeroOptions): HeroInstance {
     rig.rotation.y = rotY(t, rx);
     rig.rotation.x = ry * 0.1 + H.scroll * 0.25;
     ring.rotation.y = t * 0.22;
-    rig.position.y = H.scroll * 1.1 + Math.sin(t * 0.8) * 0.05;
+    rig.position.y = H.scroll * 1.1;
     camera.position.y = 0.2 - ry * 0.25;
     camera.lookAt(0, H.scroll * 1.1 * 0.5, 0);
     const sw = sweepAt(t);
-    (monoMat.uniforms.uTime as { value: number }).value = t;
-    (monoMat.uniforms.uSweep as { value: number }).value = sw;
-    sat.position.set(
-      Math.cos(t * 0.9) * 2.1,
-      Math.sin(t * 0.9) * 0.6 + H.scroll * 1.1,
-      Math.sin(t * 0.9) * 2.1 * 0.92,
-    );
-    sat.rotation.set(t, t * 1.3, 0);
+    (towerMat.uniforms.uTime as { value: number }).value = t;
+    (towerMat.uniforms.uSweep as { value: number }).value = sw;
     grid.position.z = (t * 0.35) % 0.5;
     renderer.setRenderTarget(rt);
     renderer.render(scene, camera);
@@ -304,8 +410,8 @@ export function createHeroMonolith(opts: HeroOptions): HeroInstance {
       io.disconnect();
       document.removeEventListener('visibilitychange', sync);
       canvas.removeEventListener('webglcontextlost', lost);
-      for (const g of [monoGeo, ringGeo, satGeo, quadGeo]) g.dispose();
-      for (const m of [monoMat, ringMat, satMat, post]) m.dispose();
+      for (const g of [towerGeo, edgeGeo, ringGeo, quadGeo]) g.dispose();
+      for (const m of [towerMat, edgeMat, ringMat, post]) m.dispose();
       grid.geometry.dispose();
       (grid.material as { dispose: () => void }).dispose();
       rt.dispose();

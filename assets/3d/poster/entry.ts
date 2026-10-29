@@ -1,6 +1,6 @@
 // Page de rendu du poster : même module que le site, rendu figé à POSTER_TIME.
 // Expose window.__poster = { width, height, rgb (base64), stray } une fois le frame lu.
-import { createHeroMonolith } from '../../../apps/web/src/islands/hero3d/HeroMonolith';
+import { createHeroBelfry } from '../../../apps/web/src/islands/hero3d/HeroBelfry';
 import { POSTER_DPR } from '../../../apps/web/src/islands/hero3d/poster';
 
 declare global {
@@ -23,7 +23,7 @@ const PALETTE = [
 ];
 
 try {
-  createHeroMonolith({
+  createHeroBelfry({
     container: box,
     pixelRatio: POSTER_DPR,
     still: true,

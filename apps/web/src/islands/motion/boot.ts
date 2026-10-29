@@ -8,7 +8,7 @@ const LINES = [
   '> INIT UNITÉ ND-01 .................. OK',
   '> CHARGEMENT : RENDU / MOTION / TÉLÉMÉTRIE',
   '> CALIBRAGE DITHER BAYER 8×8 ........ OK',
-  '> LIAISON 50.8503N 4.3517E ......... OK',
+  '> LIAISON 50.4542N 3.9523E ......... OK',
   '> SIGNAL ÉTABLI. BIENVENUE.',
 ];
 const MAX_MS = 4200;

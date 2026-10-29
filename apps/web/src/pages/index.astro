@@ -24,19 +24,22 @@ const base = ph(site?.base, '[VILLE] — BE');
 const availability = ph(site?.availability, '[DISPONIBILITÉ]');
 const origin = (Astro.site ?? Astro.url).origin;
 
-const marquee = '/// SYSTÈMES DE JEU /// CODE /// GAME DESIGN /// PROTOTYPAGE /// OUTILS /// TEMPS RÉEL /// ';
+const marquee =
+  '/// GODOT 4 /// GO /// RUST /// SVELTE 5 /// SELF-HOSTED /// LOCAL-FIRST /// CRÉATION DE MONDES /// ';
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Nicolas Dessenius',
-  jobTitle: 'Lead développeur / game designer',
+  jobTitle: 'Développeur full-stack et game developer, fondateur de CARDOR Media',
+  alternateName: 'fs0ciety7000',
+  worksFor: { '@type': 'Organization', name: 'CARDOR Media', url: 'https://cardormedia.com' },
   url: `${origin}/`,
   ...(email ? { email: `mailto:${email}` } : {}),
   ...(socials.length ? { sameAs: socials.map((s) => s.url) } : {}),
 };
 ---
-<Public title="Nicolas Dessenius — lead dev & game designer" canonical="/" jsonLd={jsonLd} boot>
+<Public title="Nicolas Dessenius — full-stack & game dev, CARDOR Media" canonical="/" jsonLd={jsonLd} boot>
   <!-- [00] HERO -->
   <section class="hero" aria-label="Présentation" data-hero>
     <div class="band">
@@ -44,11 +47,12 @@ const jsonLd = {
         <div class="hero-meta m">
           <div class="head">
             <span class="mu">[00] INDEX — REV 0.1</span>
-            <p class="lede">Systèmes de jeu, outils et expériences interactives. Conçus, codés, livrés.</p>
+            <p class="lede">Jeux vidéo narratifs, outils self-hosted et expériences interactives. Conçus, codés, documentés, livrés.</p>
           </div>
           <dl class="spec">
             <div><dt>UNITÉ</dt><dd>ND-01</dd></div>
-            <div><dt>FONCTION</dt><dd>LEAD DEV / GAME DESIGNER</dd></div>
+            <div><dt>FONCTION</dt><dd>FULL-STACK / GAME DEV</dd></div>
+            <div><dt>HOLDING</dt><dd>CARDOR MEDIA</dd></div>
             <div><dt>BASE</dt><dd>{base}</dd></div>
             <div><dt>STATUT</dt><dd>{availability}</dd></div>
           </dl>
@@ -63,7 +67,7 @@ const jsonLd = {
         <span class="ln" aria-hidden="true" data-split>NICOLAS/</span>
         <span class="ln" aria-hidden="true" data-split>DESSENIUS</span>
       </h1>
-      <div class="role m"><span>LEAD DEV ////// GAME DESIGNER</span><span aria-hidden="true">DÉFILER ▼</span></div>
+      <div class="role m"><span>FULL-STACK ////// GAME DEV ////// CARDOR MEDIA</span><span aria-hidden="true">DÉFILER ▼</span></div>
     </div>
   </section>
 
@@ -87,8 +91,7 @@ const jsonLd = {
               <Prose html={bio} />
             ) : (
               <>
-                <p>Lead développeur et game designer. Je conçois des systèmes de jeu et je les code jusqu’à ce qu’ils tiennent en main.</p>
-                <p class="mu">[BIO — PARCOURS, STUDIOS, JEUX LIVRÉS]</p>
+                <p>Fondateur de CARDOR Media à Mons, je conçois et développe des jeux vidéo narratifs, des outils self-hosted et des expériences interactives.</p>
               </>
             )
           }
@@ -96,10 +99,13 @@ const jsonLd = {
       </div>
       <dl class="dos-r sheet m" data-reveal>
         <div class="hd"><dt>SPÉCIFICATIONS</dt><dd>REV 0.1</dd></div>
-        <div><dt>RÔLE</dt><dd>LEAD DEV / GAME DESIGNER</dd></div>
-        <div><dt>DOMAINES</dt><dd>[DOMAINES]</dd></div>
-        <div><dt>MOTEURS</dt><dd>[UNITY / UNREAL / GODOT…]</dd></div>
-        <div><dt>LANGAGES</dt><dd>[C# / C++ / TS…]</dd></div>
+        <div><dt>RÔLE</dt><dd>FONDATEUR CARDOR MEDIA</dd></div>
+        <div><dt>STUDIOS</dt><dd>INTERACTIVE / SOUNDWORKS / CREATIVE LAB / PUBLISHING</dd></div>
+        <div><dt>DOMAINES</dt><dd>JEU VIDÉO / SYSTÈMES / INTERFACES / DEVOPS / CRÉATION DE MONDES</dd></div>
+        <div><dt>MOTEUR</dt><dd>GODOT 4</dd></div>
+        <div><dt>LANGAGES</dt><dd>GDSCRIPT / GO / RUST / TYPESCRIPT</dd></div>
+        <div><dt>FRONT</dt><dd>SVELTE 5 / REACT / PWA</dd></div>
+        <div><dt>INFRA</dt><dd>DOCKER / CI/CD / COOLIFY / CLOUDFLARE</dd></div>
         <div><dt>BASE</dt><dd>{base}</dd></div>
         <div><dt>STATUT</dt><dd>{availability}</dd></div>
       </dl>

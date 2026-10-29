@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Rend les posters statiques du hero en exécutant la VRAIE scène WebGL (HeroMonolith.ts) dans Chromium headless.
+// Rend les posters statiques du hero en exécutant la VRAIE scène WebGL (HeroBelfry.ts) dans Chromium headless.
 //
 //   node assets/3d/render-poster.mjs            # écrit apps/web/public/posters/hero{,-m}.{png,webp}
 //

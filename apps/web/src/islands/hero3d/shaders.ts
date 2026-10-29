@@ -1,28 +1,24 @@
 /**
- * Shaders du hero (portés à l'identique depuis prototypes/motion-lab).
+ * Shaders du hero (post-traitement porté à l'identique depuis prototypes/motion-lab).
  * Passe 1 (scène → render target) : R = luminance, G = masque accent.
  * Passe 2 (plein écran) : tramage ordonné Bayer 8×8, 1-bit phosphore + accent, cellules de `uPx` pixels.
  */
 
-export const monolithVertex = /* glsl */ `
+export const belfryVertex = /* glsl */ `
 varying vec3 vW;
-varying vec3 vL;
 void main() {
-  vL = position;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vW = w.xyz;
   gl_Position = projectionMatrix * viewMatrix * w;
 }`;
 
-// Arêtes nettes par détection en espace objet : un fragment est sur une arête quand deux axes
-// au moins sont proches de la demi-taille de la dalle.
-export const monolithFragment = /* glsl */ `
+// Éclairage plat (normales de facettes par dérivées écran), assises de pierre défilantes,
+// bande d'accent du balayage vertical. Les arêtes sont tracées à part (LineSegments).
+export const belfryFragment = /* glsl */ `
 uniform float uTime;
 uniform float uSweep;
 uniform vec3 uCam;
-uniform vec3 uHalf;
 varying vec3 vW;
-varying vec3 vL;
 void main() {
   vec3 n = normalize(cross(dFdx(vW), dFdy(vW)));
   vec3 V = normalize(uCam - vW);
@@ -30,12 +26,8 @@ void main() {
   vec3 L = normalize(vec3(-0.7, 0.8, 0.45));
   float dif = max(dot(n, L), 0.0);
   float lum = 0.07 + 0.8 * dif;
-  vec3 q = abs(vL) / uHalf;
-  vec3 e = step(vec3(0.965, 0.985, 0.9), q);
-  float edge = step(1.5, e.x + e.y + e.z);
-  lum = mix(lum, 1.0, edge);
-  lum += step(0.97, fract(vL.y * 9.0 - uTime * 0.2)) * 0.18 * (1.0 - edge);
-  float band = smoothstep(0.035, 0.0, abs(vW.y - uSweep)) * (1.0 - edge * 0.5);
+  lum += step(0.96, fract(vW.y * 11.0 - uTime * 0.2)) * 0.16;
+  float band = smoothstep(0.035, 0.0, abs(vW.y - uSweep));
   gl_FragColor = vec4(clamp(lum, 0.0, 1.0), band, 0.0, 1.0);
 }`;
 

@@ -143,7 +143,7 @@ function card(opts: { id: string; kicker: string; title: string }): Node {
 
 export const GET: APIRoute = async ({ params, locals }) => {
   const slug = params.slug ?? '';
-  let opts = { id: 'ND-01', kicker: 'LEAD DEV / GAME DESIGNER', title: 'Nicolas Dessenius' };
+  let opts = { id: 'ND-01', kicker: 'FULL-STACK / GAME DEV', title: 'Nicolas Dessenius' };
   if (slug !== 'site') {
     const db = createData(locals);
     const [found, index] = await Promise.all([db.post(slug), db.logIndex()]);
