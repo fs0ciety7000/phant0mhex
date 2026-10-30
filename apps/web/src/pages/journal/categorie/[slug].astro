@@ -22,8 +22,8 @@ if (result.totalItems > 0 && page > result.totalPages) return Astro.rewrite('/40
 const base = `/journal/categorie/${slug}`;
 ---
 <Public
-  title={category ? `${category.name} — Journal — Nicolas Dessenius` : 'Catégorie indisponible — Nicolas Dessenius'}
-  description={category?.description || `Billets de la catégorie ${category?.name ?? ''} du journal.`}
+  title={category ? `${category.name} — Blog — Nicolas Dessenius` : 'Catégorie indisponible — Nicolas Dessenius'}
+  description={category?.description || `Billets de la catégorie ${category?.name ?? ''} du blog.`}
   canonical={page > 1 ? `${base}?page=${page}` : base}
   noindex={!category}
 >
@@ -31,7 +31,7 @@ const base = `/journal/categorie/${slug}`;
     category ? (
       <JournalList
         title={category.name}
-        kicker="CATÉGORIE"
+        kicker="Catégorie"
         result={result}
         index={index}
         categories={categories}

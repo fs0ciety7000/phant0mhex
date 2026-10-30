@@ -1,0 +1,65 @@
+---
+// Catalogue filtrable. Sans JavaScript, toutes les cartes restent visibles ; le script ne fait que masquer.
+import type { Project } from '@nd/pb-types';
+import { FILTERS } from '../lib/projects';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  projects: Project[];
+  headingLevel?: 2 | 3;
+}
+const { projects, headingLevel = 3 } = Astro.props;
+const counts = Object.fromEntries(FILTERS.map((f) => [f.id, projects.filter(f.test).length]));
+const tagsOf = (p: Project) =>
+  FILTERS.filter((f) => f.id !== 'tous' && f.test(p))
+    .map((f) => f.id)
+    .join(' ');
+---
+<div class="filters" data-filters hidden>
+  <div class="chips" role="group" aria-label="Filtrer les projets">
+    {
+      FILTERS.filter((f) => counts[f.id]).map((f) => (
+        <button class="chip" type="button" data-filter={f.id} aria-pressed={f.id === 'tous' ? 'true' : 'false'}>
+          {f.label}
+          <small>{counts[f.id]}</small>
+        </button>
+      ))
+    }
+  </div>
+</div>
+<ul class="pgrid" data-grid>
+  {
+    projects.map((p) => (
+      <li data-tags={tagsOf(p)}>
+        <ProjectCard project={p} headingLevel={headingLevel} />
+      </li>
+    ))
+  }
+</ul>
+<p class="sr-only" role="status" aria-live="polite" data-filter-status></p>
+<script>
+  function init(): void {
+    for (const box of document.querySelectorAll<HTMLElement>('[data-filters]')) {
+      const grid = box.nextElementSibling as HTMLElement | null;
+      const status = grid?.nextElementSibling as HTMLElement | null;
+      if (!grid || box.dataset.ready) continue;
+      box.dataset.ready = '1';
+      box.hidden = false;
+      box.addEventListener('click', (e) => {
+        const btn = (e.target as Element).closest<HTMLButtonElement>('[data-filter]');
+        if (!btn) return;
+        const id = btn.dataset.filter ?? 'tous';
+        for (const b of box.querySelectorAll('[data-filter]')) b.setAttribute('aria-pressed', String(b === btn));
+        let shown = 0;
+        for (const li of grid.querySelectorAll<HTMLElement>('li[data-tags]')) {
+          const on = id === 'tous' || (li.dataset.tags ?? '').split(' ').includes(id);
+          li.hidden = !on;
+          if (on) shown++;
+        }
+        if (status) status.textContent = `${shown} projet${shown > 1 ? 's' : ''} affiché${shown > 1 ? 's' : ''}.`;
+      });
+    }
+  }
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

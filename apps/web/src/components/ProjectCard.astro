@@ -1,0 +1,47 @@
+---
+import type { Project } from '@nd/pb-types';
+import { projectHost, projectImage } from '../lib/projects';
+
+interface Props {
+  project: Project;
+  /** Grande carte de la sélection. */
+  featured?: boolean;
+  headingLevel?: 2 | 3;
+}
+const { project: p, featured = false, headingLevel = 3 } = Astro.props;
+const H = headingLevel === 2 ? 'h2' : 'h3';
+const img = projectImage(p);
+const host = projectHost(p);
+const href = `/projets/${p.slug}`;
+const label = [p.kind, p.mons ? 'Mons' : ''].filter(Boolean).join(' · ');
+---
+{
+  featured ? (
+    <a class="feat" href={href}>
+      <div class="shot">
+        {img && <img src={img} alt={`Capture de ${p.title}`} width="960" height="600" loading="lazy" decoding="async" />}
+      </div>
+      <div class="feat-body">
+        <div class="kicker mono">
+          <span>{label}</span>
+          <span>{host}</span>
+        </div>
+        <H>{p.title}</H>
+        {p.summary && <p>{p.summary}</p>}
+        <span class="go">Voir le projet →</span>
+      </div>
+    </a>
+  ) : (
+    <a class="pcard" href={href}>
+      <div class="shot">
+        {img && <img src={img} alt={`Capture de ${p.title}`} width="960" height="600" loading="lazy" decoding="async" />}
+      </div>
+      {label && <span class="mono">{label}</span>}
+      <H>
+        {p.title}
+        <span aria-hidden="true">→</span>
+      </H>
+      {p.summary && <p>{p.summary}</p>}
+    </a>
+  )
+}

@@ -12,8 +12,6 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
-  /** Données de page posées sur <body> (ex. `data-boot` sur l'accueil). */
-  boot?: boolean;
   publishedTime?: string;
   modifiedTime?: string;
 }
@@ -25,7 +23,6 @@ const {
   image = '/og/site.png',
   type = 'website',
   jsonLd,
-  boot = false,
   publishedTime,
   modifiedTime,
 } = Astro.props;
@@ -40,8 +37,9 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : '';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef0f2" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1114" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonicalUrl} />}
@@ -61,17 +59,17 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : '';
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title="Journal — Nicolas Dessenius" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Blog — Nicolas Dessenius" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=EB+Garamond:ital@1&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     />
     {ld && <script is:inline type="application/ld+json" set:html={ld} />}
     <slot name="head" />
   </head>
-  <body data-boot={boot ? '' : undefined}>
+  <body>
     <slot />
   </body>
 </html>

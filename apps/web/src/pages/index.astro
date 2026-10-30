@@ -1,188 +1,249 @@
 ---
 import PostCard from '../components/PostCard.astro';
-import ProjectTable from '../components/ProjectTable.astro';
-import Prose from '../components/Prose.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
 import SectionHead from '../components/SectionHead.astro';
-import Hero3D from '../islands/hero3d/Hero3D.astro';
 import Public from '../layouts/Public.astro';
-import { createData, logNo } from '../lib/data';
-import { pad, ph } from '../lib/format';
-import { renderMarkdown } from '../lib/render';
+import { createData } from '../lib/data';
 
 const db = createData(Astro.locals);
-const [site, projects, latest, index] = await Promise.all([
-  db.site(),
-  db.projects(),
-  db.posts({ perPage: 3 }),
-  db.logIndex(),
-]);
+const [site, projects, latest] = await Promise.all([db.site(), db.projects(), db.posts({ perPage: 1 })]);
 
-const bio = site?.bio?.trim() ? (await renderMarkdown(db, site.bio)).html : '';
+const featured = projects.filter((p) => p.featured);
+const catalogue = projects.filter((p) => !p.featured);
+const games = projects.filter((p) => p.type === 'jeu').length;
 const email = site?.email?.trim() ?? '';
 const socials = (Array.isArray(site?.socials) ? site.socials : []).filter((s) => s?.label && s?.url);
-const base = ph(site?.base, '[VILLE] — BE');
-const availability = ph(site?.availability, '[DISPONIBILITÉ]');
+const post = latest.items[0];
 const origin = (Astro.site ?? Astro.url).origin;
 
-const marquee =
-  '/// GODOT 4 /// GO /// RUST /// SVELTE 5 /// SELF-HOSTED /// LOCAL-FIRST /// CRÉATION DE MONDES /// ';
+const studios = [
+  {
+    name: 'CM Interactive',
+    href: 'https://interactive.cardormedia.com',
+    text: 'Jeux 3D, web temps réel, plateformes interactives',
+  },
+  {
+    name: 'CM Soundworks',
+    href: 'https://sound.cardormedia.com',
+    text: 'Sound design, voix, musique et mixage',
+  },
+  {
+    name: 'CM Creative Lab',
+    href: 'https://creative.cardormedia.com',
+    text: 'Illustration, direction artistique, lore, identité',
+  },
+  {
+    name: 'CM Publishing',
+    href: 'https://publishing.cardormedia.com',
+    text: 'Édition numérique et liseuse interactive',
+  },
+];
+
+const skills = [
+  {
+    stack: 'Godot 4 · GDScript',
+    title: 'Jeux vidéo',
+    text: 'Boucles de jeu, génération procédurale, systèmes de règles, narrative design, accessibilité, exports multi-plateformes.',
+  },
+  {
+    stack: 'Go · Rust',
+    title: 'Systèmes et backend',
+    text: 'Serveurs multimédia, API et agents en Go. Outils bas niveau, TUI et GUI en Rust.',
+  },
+  {
+    stack: 'TypeScript · Svelte 5 · React',
+    title: 'Interfaces',
+    text: 'PWA, design systems soignés, interfaces pensées pour le clavier, Three.js et shaders.',
+  },
+  {
+    stack: 'Docker · Coolify · Cloudflare',
+    title: 'Infrastructure',
+    text: 'Packaging multi-arch, CI/CD, une cinquantaine de services auto-hébergés en production.',
+  },
+  {
+    stack: 'Lore · DA · son',
+    title: 'Création de mondes',
+    text: 'Direction artistique, écriture, voix et musique : des univers cohérents d’un médium à l’autre.',
+  },
+];
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Nicolas Dessenius',
-  jobTitle: 'Développeur full-stack et game developer, fondateur de CARDOR Media',
   alternateName: 'fs0ciety7000',
+  jobTitle: 'Développeur full-stack et game developer',
   worksFor: { '@type': 'Organization', name: 'CARDOR Media', url: 'https://cardormedia.com' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Mons', addressCountry: 'BE' },
   url: `${origin}/`,
   ...(email ? { email: `mailto:${email}` } : {}),
-  ...(socials.length ? { sameAs: socials.map((s) => s.url) } : {}),
+  sameAs: ['https://github.com/fs0ciety7000', 'https://cardormedia.com', ...socials.map((s) => s.url)].filter(
+    (u, i, a) => a.indexOf(u) === i,
+  ),
 };
 ---
-<Public title="Nicolas Dessenius — full-stack & game dev, CARDOR Media" canonical="/" jsonLd={jsonLd} boot>
-  <!-- [00] HERO -->
-  <section class="hero" aria-label="Présentation" data-hero>
-    <div class="band">
-      <div class="hero-grid">
-        <div class="hero-meta m">
-          <div class="head">
-            <span class="mu">[00] INDEX — REV 0.1</span>
-            <p class="lede">Jeux vidéo narratifs, outils self-hosted et expériences interactives. Conçus, codés, documentés, livrés.</p>
+<Public title="Nicolas Dessenius — développeur full-stack et game developer à Mons" canonical="/" jsonLd={jsonLd}>
+  <section class="hero" aria-labelledby="h-hero">
+    <div class="wrap">
+      <p class="mono muted">Mons, Belgique · fs0ciety7000</p>
+      <h1 id="h-hero">Nicolas<br />Dessenius<em>.</em></h1>
+      <div class="hero-row">
+        <div class="cta-col" style="display:grid;gap:24px">
+          <p class="lede">
+            Développeur full-stack et game developer. Je conçois, code et mets en ligne des jeux, des outils et des
+            mondes, du premier croquis au déploiement.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="#projets">Voir les projets ↓</a>
+            <a class="btn" href="#contact">Me contacter</a>
           </div>
-          <dl class="spec">
-            <div><dt>UNITÉ</dt><dd>ND-01</dd></div>
-            <div><dt>FONCTION</dt><dd>FULL-STACK / GAME DEV</dd></div>
-            <div><dt>HOLDING</dt><dd>CARDOR MEDIA</dd></div>
-            <div><dt>BASE</dt><dd>{base}</dd></div>
-            <div><dt>STATUT</dt><dd>{availability}</dd></div>
-          </dl>
         </div>
-        <div class="hero-stage">
-          <Hero3D />
-        </div>
+        {
+          projects.length > 0 && (
+            <dl class="facts">
+              <div><dt>projets en ligne</dt><dd>{projects.length}</dd></div>
+              <div><dt>jeux jouables</dt><dd>{games}</dd></div>
+              <div><dt>studios CARDOR Media</dt><dd>{studios.length}</dd></div>
+            </dl>
+          )
+        }
       </div>
     </div>
-    <div class="hero-title band">
-      <h1 class="macro" aria-label="Nicolas Dessenius">
-        <span class="ln" aria-hidden="true" data-split>NICOLAS/</span>
-        <span class="ln" aria-hidden="true" data-split>DESSENIUS</span>
-      </h1>
-      <div class="role m"><span>FULL-STACK ////// GAME DEV ////// CARDOR MEDIA</span><span aria-hidden="true">DÉFILER ▼</span></div>
-    </div>
   </section>
 
-  <div class="stripe" aria-hidden="true">
-    <div class="hazard"></div>
-    <div class="marq"><span>{marquee}</span><span>{marquee}</span></div>
-    <div class="hazard"></div>
-  </div>
-
-  <!-- [01] DOSSIER -->
-  <section class="sec band" id="dossier" aria-labelledby="h-dos">
-    <SectionHead idx="01" title="DOSSIER" id="h-dos">
-      <Fragment slot="note">FICHE TECHNIQUE<br />ND-01 / A</Fragment>
+  <section id="projets" class="wrap" aria-labelledby="h-sel">
+    {
+      featured.length > 0 && (
+        <>
+          <SectionHead title="Sélection" id="h-sel">
+            Quelques projets qui montrent l’éventail : jeux narratifs, FPS, enquêtes, logiciel libre.
+          </SectionHead>
+          <div class="featured">
+            {featured.map((p) => (
+              <ProjectCard project={p} featured />
+            ))}
+          </div>
+        </>
+      )
+    }
+    <SectionHead title={featured.length ? 'Tout le catalogue' : 'Projets'} id={featured.length ? 'h-cat' : 'h-sel'}>
+      Chaque carte mène à sa fiche, puis au projet en ligne.
     </SectionHead>
-    <div class="dos">
-      <div class="dos-l">
-        <p class="serif-dither" data-reveal>Jouer est une affaire <em>sérieuse.</em></p>
-        <div class="bio" data-reveal>
-          {
-            bio ? (
-              <Prose html={bio} />
-            ) : (
-              <>
-                <p>Fondateur de CARDOR Media à Mons, je conçois et développe des jeux vidéo narratifs, des outils self-hosted et des expériences interactives.</p>
-              </>
-            )
-          }
-        </div>
-      </div>
-      <dl class="dos-r sheet m" data-reveal>
-        <div class="hd"><dt>SPÉCIFICATIONS</dt><dd>REV 0.1</dd></div>
-        <div><dt>RÔLE</dt><dd>FONDATEUR CARDOR MEDIA</dd></div>
-        <div><dt>STUDIOS</dt><dd>INTERACTIVE / SOUNDWORKS / CREATIVE LAB / PUBLISHING</dd></div>
-        <div><dt>DOMAINES</dt><dd>JEU VIDÉO / SYSTÈMES / INTERFACES / DEVOPS / CRÉATION DE MONDES</dd></div>
-        <div><dt>MOTEUR</dt><dd>GODOT 4</dd></div>
-        <div><dt>LANGAGES</dt><dd>GDSCRIPT / GO / RUST / TYPESCRIPT</dd></div>
-        <div><dt>FRONT</dt><dd>SVELTE 5 / REACT / PWA</dd></div>
-        <div><dt>INFRA</dt><dd>DOCKER / CI/CD / COOLIFY / CLOUDFLARE</dd></div>
-        <div><dt>BASE</dt><dd>{base}</dd></div>
-        <div><dt>STATUT</dt><dd>{availability}</dd></div>
-      </dl>
-    </div>
+    {
+      catalogue.length > 0 ? (
+        <ProjectGrid projects={catalogue} />
+      ) : (
+        <p class="empty">
+          <b>{Astro.locals.degraded ? 'Projets indisponibles.' : 'Aucun projet publié.'}</b>
+          {Astro.locals.degraded ? 'La base de contenu ne répond pas, réessayez dans quelques instants.' : ''}
+        </p>
+      )
+    }
   </section>
 
-  <!-- [02] PROJETS -->
-  <section class="sec band" id="projets" aria-labelledby="h-pro">
-    <SectionHead idx="02" title="PROJETS" id="h-pro" red>
-      <Fragment slot="note">INDEX<br /><span class="tab">{pad(projects.length)}</span> ENTRÉES</Fragment>
+  <section id="competences" class="wrap" aria-labelledby="h-skills">
+    <SectionHead title="Ce que je sais faire" id="h-skills">
+      Du prototype rapide à la production : exports multi-plateformes, packaging, CI, déploiement self-hosted.
     </SectionHead>
-    <ProjectTable projects={projects} />
-    <div class="jhead after m mu">
-      <span>/// INDEX COMPLET</span>
-      <a class="hit" href="/projets"><span data-scramble>TOUS LES PROJETS</span>&nbsp;<span class="ac" aria-hidden="true">&gt;&gt;&gt;</span></a>
-    </div>
-  </section>
-
-  <!-- [03] JOURNAL -->
-  <section class="sec band" id="journal" aria-labelledby="h-jou">
-    <SectionHead idx="03" title="JOURNAL" id="h-jou">
-      <Fragment slot="note">BILLETS<br />DERNIERS ENVOIS</Fragment>
-    </SectionHead>
-    <div class="jhead m mu">
-      <span>/// {latest.items.length ? 'DERNIERS BILLETS PUBLIÉS' : 'AUCUN BILLET PUBLIÉ — CONTENU À VENIR'}</span>
-      <a href="/journal" class="btn"><span data-scramble>TOUT LE JOURNAL</span> <span class="ac" aria-hidden="true">&gt;&gt;&gt;</span></a>
-    </div>
-    <div class="jgrid">
+    <div class="skills">
       {
-        latest.items.length
-          ? latest.items.map((p, i) => <PostCard post={p} no={logNo(index, p.id)} rank={i + 1} />)
-          : [1, 2, 3].map((r) => <PostCard rank={r} />)
+        skills.map((s) => (
+          <div class="skill">
+            <span class="mono">{s.stack}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))
       }
     </div>
   </section>
 
-  <!-- [04] CANAL -->
-  <section class="sec band" id="canal" aria-labelledby="h-can">
-    <div class="rule r" data-reveal></div>
-    <header class="sec-h">
-      <span class="idx m ac">[04]</span>
-      <span class="note m mu">CANAL OUVERT<br />E-MAIL DIRECT</span>
-    </header>
-    <h2 class="macro canal-big" id="h-can"><span class="ln" data-split>PARLONS<span class="ac">.</span></span></h2>
-    <div class="cgrid">
-      <div class="cmail">
-        <span class="m mu">ADRESSE DIRECTE</span>
-        {
-          email ? (
-            <a class="addr" href={`mailto:${email}`}>
-              {email}
-            </a>
-          ) : (
-            <span class="addr mu">[CONTACT]@DESSENIUS.BE</span>
-          )
-        }
-        <span class="m mu">&gt;&gt;&gt; PAS DE FORMULAIRE. UN E-MAIL SUFFIT.</span>
+  <section id="cardor" class="band-dark" aria-labelledby="h-cardor">
+    <div class="wrap">
+      <div>
+        <p class="mono" style="opacity:.7">Holding de divertissement · Mons</p>
+        <h2 id="h-cardor">CARDOR Media</h2>
+        <p>
+          J’ai fondé CARDOR Media pour réunir mes projets sous un même noyau créatif : quatre studios, du jeu vidéo à
+          l’édition.
+        </p>
+        <a class="btn" href="https://cardormedia.com" rel="noopener">cardormedia.com ↗</a>
       </div>
-      <ul class="clinks m" aria-label="Réseaux">
+      <div class="studios">
         {
-          socials.length
-            ? socials.map((s) => (
-                <li>
-                  <a href={s.url} target="_blank" rel="noopener me">
-                    <span data-scramble>{s.label}</span>
-                    <span class="ac" aria-hidden="true">↗</span>
-                  </a>
-                </li>
-              ))
-            : ['[GITHUB]', '[LINKEDIN]', '[ITCH.IO]'].map((l) => (
-                <li class="l">
-                  <span>{l}</span>
-                  <span aria-hidden="true">↗</span>
-                </li>
-              ))
+          studios.map((s) => (
+            <a class="studio" href={s.href} rel="noopener">
+              <b>{s.name}</b>
+              <span>{s.text}</span>
+            </a>
+          ))
         }
-      </ul>
+      </div>
     </div>
   </section>
+
+  <div class="wrap duo">
+    <section id="journal" aria-labelledby="h-journal">
+      <h2 class="label mono" id="h-journal">Blog · dernier billet</h2>
+      {
+        post ? (
+          <PostCard post={post} />
+        ) : (
+          <div class="post">
+            <h3>Le blog arrive.</h3>
+            <p>Notes de fabrication, décisions techniques et post-mortems.</p>
+          </div>
+        )
+      }
+      <p style="margin-top:16px"><a class="go" href="/journal">Tout le blog →</a></p>
+    </section>
+
+    <section id="contact" class="contact" aria-labelledby="h-contact">
+      <h2 id="h-contact">Un projet, un poste, une idée ?</h2>
+      <p>Je réponds aux recrutements, aux collaborations et aux joueurs.</p>
+      {
+        email && (
+          <div class="mail">
+            <a href={`mailto:${email}`} id="mail">{email}</a>
+            <button class="copy" type="button" data-copy-mail={email} hidden>Copier</button>
+          </div>
+        )
+      }
+      <ul class="links">
+        <li><a href="https://github.com/fs0ciety7000" rel="noopener me">GitHub</a></li>
+        <li><a href="https://cardormedia.com" rel="noopener">CARDOR Media</a></li>
+        <li><a href="https://apps.cardormedia.com" rel="noopener">Tous les jeux</a></li>
+        {socials
+          .filter((s) => !/github\.com\/fs0ciety7000|cardormedia\.com\/?$/.test(s.url))
+          .map((s) => (
+            <li><a href={s.url} rel="noopener me">{s.label}</a></li>
+          ))}
+      </ul>
+      <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+    </section>
+  </div>
 </Public>
+
+<script>
+  function init(): void {
+    const btn = document.querySelector<HTMLButtonElement>('[data-copy-mail]');
+    if (!btn || btn.dataset.ready) return;
+    btn.dataset.ready = '1';
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      const status = document.querySelector<HTMLElement>('[data-copy-status]');
+      let ok = true;
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copyMail ?? '');
+      } catch {
+        ok = false;
+      }
+      btn.textContent = ok ? 'Copié' : 'Échec';
+      if (status) status.textContent = ok ? 'Adresse copiée.' : 'La copie a échoué.';
+      setTimeout(() => (btn.textContent = 'Copier'), 1500);
+    });
+  }
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

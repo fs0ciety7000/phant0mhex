@@ -20,14 +20,14 @@ if (result.totalItems > 0 && page > result.totalPages) return Astro.rewrite('/40
 const canonical = page > 1 && !q ? `/journal?page=${page}` : '/journal';
 ---
 <Public
-  title={q ? `Recherche « ${q} » — Journal — Nicolas Dessenius` : 'Journal — Nicolas Dessenius'}
-  description="Journal de Nicolas Dessenius : game design, développement, outils, post-mortems."
+  title={q ? `Recherche « ${q} » — Blog — Nicolas Dessenius` : 'Blog — Nicolas Dessenius'}
+  description="Blog de Nicolas Dessenius : game design, développement, outils, post-mortems."
   canonical={canonical}
   noindex={Boolean(q)}
 >
   <JournalList
-    title="JOURNAL"
-    kicker="INDEX"
+    title="Blog"
+    kicker="Tous les billets"
     result={result}
     index={index}
     categories={categories}

@@ -74,7 +74,15 @@ export interface Project extends BaseRecord {
   cover: string;
   order: number;
   featured: boolean;
+  /** Filtre du catalogue public. */
+  type: ProjectType | '';
+  /** Libellé court affiché sur la carte (« Jeu d’enquête », « Client SSH · Rust »…). */
+  kind: string;
+  /** Projet ancré à Mons (filtre « Ancrés à Mons »). */
+  mons: boolean;
 }
+
+export type ProjectType = 'jeu' | 'outil' | 'creation';
 
 export interface Social {
   label: string;

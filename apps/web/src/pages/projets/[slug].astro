@@ -3,8 +3,8 @@ import Prose from '../../components/Prose.astro';
 import SignalLost from '../../components/SignalLost.astro';
 import Public from '../../layouts/Public.astro';
 import { createData } from '../../lib/data';
-import { PH, projectId } from '../../lib/format';
-import { fileUrl, thumbSrcset } from '../../lib/pb';
+import { thumbSrcset } from '../../lib/pb';
+import { projectHost, projectImage, TYPE_LABEL } from '../../lib/projects';
 import { renderMarkdown } from '../../lib/render';
 
 const slug = Astro.params.slug ?? '';
@@ -22,13 +22,18 @@ if (!project) {
 const html = project?.body?.trim() ? (await renderMarkdown(db, project.body)).html : '';
 const prev = i > 0 ? projects[i - 1] : undefined;
 const next = i >= 0 && i < projects.length - 1 ? projects[i + 1] : undefined;
-const cover = project?.cover ? fileUrl(project.collectionName, project.id, project.cover, '1920x0') : '';
-let host = '';
-try {
-  host = project?.url ? new URL(project.url).host : '';
-} catch {
-  host = '';
-}
+const image = project ? projectImage(project, '1920x0') : '';
+const srcset = project?.cover ? thumbSrcset(project.collectionName, project.id, project.cover) : undefined;
+const host = project ? projectHost(project) : '';
+const facts = project
+  ? [
+      ['Type', project.type ? TYPE_LABEL[project.type] : ''],
+      ['Genre', project.kind],
+      ['Rôle', project.role],
+      ['Année', project.year],
+      ['Ancrage', project.mons ? 'Mons' : ''],
+    ].filter(([, v]) => v && !/^\[.*\]$/.test(v))
+  : [];
 ---
 <Public
   title={project ? `${project.title} — Projets — Nicolas Dessenius` : 'Projet indisponible — Nicolas Dessenius'}
@@ -38,88 +43,83 @@ try {
 >
   {
     !project ? (
-      <SignalLost back={{ href: '/projets', label: 'PROJETS' }} />
+      <SignalLost back={{ href: '/projets', label: 'Projets' }} />
     ) : (
-      <article>
-        <header class="art-head band">
-          <nav class="crumbs m mu" aria-label="Fil d’Ariane">
-            <a href="/projets">[02] PROJETS</a>
+      <article class="wrap" aria-labelledby="h-pro">
+        <header class="doc-head">
+          <nav class="crumbs mono" aria-label="Fil d’Ariane">
+            <a href="/projets">Projets</a>
             <span aria-hidden="true">/</span>
-            <span class="ac tab">{projectId(i)}</span>
+            <span>{project.title}</span>
           </nav>
-          <h1 class="macro art-title" data-split>
-            {project.title}
-          </h1>
-          {project.summary && <p class="art-lede">{project.summary}</p>}
-          <dl class="art-meta m">
-            <div>
-              <dt>ID</dt>
-              <dd class="ac tab">{projectId(i)}</dd>
+          <h1 id="h-pro">{project.title}</h1>
+          {project.summary && <p class="doc-lede">{project.summary}</p>}
+          {facts.length > 0 && (
+            <dl class="facts-row mono">
+              {facts.map(([k, v]) => (
+                <div>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {host && (
+            <div class="cta">
+              <a class="btn primary" href={project.url} rel="noopener">
+                Ouvrir {host} ↗
+              </a>
             </div>
-            <div>
-              <dt>RÔLE</dt>
-              <dd>{project.role || PH}</dd>
-            </div>
-            <div>
-              <dt>ANNÉE</dt>
-              <dd class="tab">{project.year || PH}</dd>
-            </div>
-            <div>
-              <dt>ACCÈS</dt>
-              <dd>
-                {host ? (
-                  <a class="hit" href={project.url} target="_blank" rel="noopener">
-                    {host}&nbsp;<span class="ac" aria-hidden="true">↗</span>
-                  </a>
-                ) : (
-                  PH
-                )}
-              </dd>
-            </div>
-          </dl>
+          )}
         </header>
-        {cover && (
-          <figure class="art-cover band">
-            <img
-              src={cover}
-              srcset={thumbSrcset(project.collectionName, project.id, project.cover)}
-              sizes="(min-width: 1440px) 1360px, 100vw"
-              alt=""
-              loading="eager"
-              decoding="async"
-            />
+        {image && (
+          <figure class="doc-cover">
+            <a href={project.url || undefined} rel="noopener" tabindex="-1">
+              <img
+                src={image}
+                srcset={srcset}
+                sizes="(min-width: 1240px) 1208px, 100vw"
+                alt={`Capture de ${project.title}`}
+                width="960"
+                height="600"
+                loading="eager"
+                decoding="async"
+              />
+            </a>
           </figure>
         )}
-        <div class="art-body band">
-          <aside class="art-side m mu">
-            <div class="art-side-in">
-              <span>/// DOSSIER PROJET</span>
+        {html && (
+          <div class="doc-body">
+            <aside class="doc-side mono muted">À propos du projet</aside>
+            <div>
+              <Prose html={html} />
             </div>
-          </aside>
-          <div class="art-main">
-            {html ? <Prose html={html} /> : <p class="m mu">[DESCRIPTION DU PROJET — CONTENU À VENIR]</p>}
           </div>
-        </div>
-        <div class="band art-foot">
-        <nav class="prevnext m" aria-label="Projets voisins">
+        )}
+        <nav class="prevnext" aria-label="Projets voisins">
           {prev ? (
             <a href={`/projets/${prev.slug}`} rel="prev">
-              <span class="mu">&lt;&lt;&lt; PRÉCÉDENT</span>
+              <span class="mono">← Précédent</span>
               <span class="t">{prev.title}</span>
             </a>
           ) : (
-            <span class="mu">&lt;&lt;&lt; DÉBUT DE L’INDEX</span>
+            <a href="/projets">
+              <span class="mono">← Retour</span>
+              <span class="t">Tous les projets</span>
+            </a>
           )}
           {next ? (
             <a class="next" href={`/projets/${next.slug}`} rel="next">
-              <span class="mu">SUIVANT &gt;&gt;&gt;</span>
+              <span class="mono">Suivant →</span>
               <span class="t">{next.title}</span>
             </a>
           ) : (
-            <span class="next mu">FIN DE L’INDEX &gt;&gt;&gt;</span>
+            <a class="next" href="/projets">
+              <span class="mono">Retour →</span>
+              <span class="t">Tous les projets</span>
+            </a>
           )}
         </nav>
-        </div>
       </article>
     )
   }

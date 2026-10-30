@@ -33,8 +33,8 @@ pnpm e2e                      # Playwright (PW_CHROMIUM_PATH=/opt/pw-browsers/ch
 - **Un seul pipeline Markdown** (`packages/markdown`) pour le site et l'aperçu admin. Ne jamais rendre du Markdown ailleurs.
 - **Schéma PocketBase uniquement via migrations** dans `apps/pb/pb_migrations` (jamais de modif manuelle dans le dashboard en prod). Mettre à jour `packages/pb-types` ensuite.
 - Les règles d'accès PocketBase sont la frontière de sécurité : un billet non publié ne doit jamais être lisible publiquement (`status = "published" && published_at <= @now`).
-- Design : tokens de `packages/tokens` uniquement, `border-radius: 0`, un seul accent `#FF2A2A`, `#4AF626` réservé au voyant SYS ONLINE. Pas de chiffres inventés sur Nicolas : placeholders `[…]`.
-- 3D/motion : respecter `prefers-reduced-motion`, poster statique avant WebGL, budgets de `docs/ARCHITECTURE.md` §7.
+- Design du site public (refonte portfolio, 2026-10) : tokens de `apps/web/src/styles/public.css` (clair par défaut, sombre selon le système), Bricolage Grotesque / Instrument Sans / JetBrains Mono, un seul accent rouge. Le travail d'abord : captures des projets (`apps/web/public/projets/<slug>.webp`, une couverture envoyée dans l'admin reste prioritaire). Plus de boot, de CRT ni de hero 3D côté public. L'admin garde ND-01 (`packages/tokens`). Pas de chiffres inventés sur Nicolas : placeholders `[…]`.
+- 3D/motion : respecter `prefers-reduced-motion`. Les îlots `hero3d` et `motion` ne sont plus montés par le site public (conservés pour réemploi).
 - Copie du site en **français**.
 
 ## Infra (lecture faite le 2026-10-17)

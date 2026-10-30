@@ -13,7 +13,18 @@ import { useToast } from '../ui/Toasts';
 
 type Form = Pick<
   Project,
-  'title' | 'slug' | 'role' | 'year' | 'url' | 'summary' | 'body' | 'order' | 'featured'
+  | 'title'
+  | 'slug'
+  | 'role'
+  | 'year'
+  | 'url'
+  | 'summary'
+  | 'body'
+  | 'order'
+  | 'featured'
+  | 'type'
+  | 'kind'
+  | 'mons'
 >;
 const EMPTY: Form = {
   title: '',
@@ -25,6 +36,9 @@ const EMPTY: Form = {
   body: '',
   order: 0,
   featured: false,
+  type: '',
+  kind: '',
+  mons: false,
 };
 const pick = (p: Project): Form => ({
   title: p.title,
@@ -36,6 +50,9 @@ const pick = (p: Project): Form => ({
   body: p.body,
   order: p.order,
   featured: p.featured,
+  type: p.type,
+  kind: p.kind,
+  mons: p.mons,
 });
 
 export default function ProjectEditor({ param }: { param: string }) {
@@ -161,6 +178,19 @@ export default function ProjectEditor({ param }: { param: string }) {
               />
             </label>
             <label className="adm-field">
+              <span>Type</span>
+              <select value={form.type} onChange={(e) => set('type', e.target.value as Form['type'])}>
+                <option value="">—</option>
+                <option value="jeu">Jeu</option>
+                <option value="outil">Outil ou appli</option>
+                <option value="creation">Création</option>
+              </select>
+            </label>
+            <label className="adm-field">
+              <span>Libellé (carte)</span>
+              <input value={form.kind} onChange={(e) => set('kind', e.target.value)} />
+            </label>
+            <label className="adm-field">
               <span>Rôle</span>
               <input value={form.role} onChange={(e) => set('role', e.target.value)} />
             </label>
@@ -249,6 +279,10 @@ export default function ProjectEditor({ param }: { param: string }) {
               onChange={(e) => set('featured', e.target.checked)}
             />
             <span>Mis en avant</span>
+          </label>
+          <label className="adm-check">
+            <input type="checkbox" checked={form.mons} onChange={(e) => set('mons', e.target.checked)} />
+            <span>Ancré à Mons</span>
           </label>
         </div>
         <h2 className="adm-aside-h">[ Méta ]</h2>

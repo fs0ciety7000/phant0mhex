@@ -22,7 +22,7 @@ if (result.totalItems > 0 && page > result.totalPages) return Astro.rewrite('/40
 const base = `/journal/tag/${slug}`;
 ---
 <Public
-  title={tag ? `#${tag.name} — Journal — Nicolas Dessenius` : 'Étiquette indisponible — Nicolas Dessenius'}
+  title={tag ? `#${tag.name} — Blog — Nicolas Dessenius` : 'Étiquette indisponible — Nicolas Dessenius'}
   description={`Billets du journal étiquetés « ${tag?.name ?? ''} ».`}
   canonical={page > 1 ? `${base}?page=${page}` : base}
   noindex={!tag}
@@ -31,7 +31,7 @@ const base = `/journal/tag/${slug}`;
     tag ? (
       <JournalList
         title={`#${tag.name}`}
-        kicker="ÉTIQUETTE"
+        kicker="Étiquette"
         result={result}
         index={index}
         categories={categories}

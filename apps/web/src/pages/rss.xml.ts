@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ locals, site, url }) => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Journal — Nicolas Dessenius</title>
+    <title>Blog — Nicolas Dessenius</title>
     <link>${origin}/journal</link>
     <description>Game design, développement, outils et post-mortems.</description>
     <language>fr</language>
